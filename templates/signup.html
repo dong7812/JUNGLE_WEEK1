@@ -172,20 +172,14 @@
       const email = qs('#email').value.trim();
       if (!emailRe.test(email)) { showToast('올바른 이메일을 입력하세요'); return; }
 
-      // 1) 데모: 클라에서 코드 생성 (※ 실서비스는 서버에서 생성/저장!)
-      const code = genCode();
-      const exp = Date.now() + 10 * 60 * 1000; // 10분
-      sessionStorage.setItem(CODE_KEY, code);
-      sessionStorage.setItem(EXP_KEY, String(exp));
-
-      // 2) UI 상태
+      // UI 상태
       qs('#emailCodeInput').disabled = false;
       qs('#btnVerify').disabled = false;
       setVerified(false);
       qs('#verifyMsg').textContent = '인증번호가 전송되었습니다. 10분 내 입력해 주세요.';
       startCooldown(60);
 
-      // 3) 서버로 이메일 전송 (Flask /code/send 사용)
+      // 서버로 이메일 전송 (Flask /code/send 사용)
       try {
         const res = await $.ajax({
           type: "POST",
