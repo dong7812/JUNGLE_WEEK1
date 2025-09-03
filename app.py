@@ -405,12 +405,13 @@ def api_user():
 
 
 # 글 목록
+
 @app.route("/api/posts", methods=["GET"])
 def list_posts():
     q = {}
     uid = (request.args.get("uid") or "").strip()
     if uid:
-        q["userID"] = uid  # 저장 시 userID에 email을 넣고 있음
+        q["userID"] = uid  # ← 글 저장 시 userID(=email/uid)로 저장했으니 여기로 매칭
 
     docs = []
     for d in posts_col.find(q).sort("createdAt", -1):
