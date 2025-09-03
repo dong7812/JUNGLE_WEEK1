@@ -14,17 +14,9 @@
   <!-- 구글폰트 -->
   <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
 
-  <!-- 텍스트형태로 되어있는 icon 을 쓸 수 있도록 Font awesome 을 포함 -->
-  <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>회원가입</title>
-  <!-- Tailwind CSS (CDN) - 개발/프로토타입 용 -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- tailwindcss -->
   <script>
-    // Tailwind 커스텀(선택)
+    // Tailwind 커스텀
     tailwind.config = {
       theme: {
         extend: {
@@ -35,50 +27,26 @@
       }
     }
   </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <title>비밀번호 재설정</title>
+
 </head>
 
 <body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
   <main class="w-full max-w-xl">
-    <div>
-      <img src="../static/logo 1.svg">
+    <!-- 헤더(로고 자리) -->
+    <header class="mb-6 flex items-center gap-3">
+       <div>
+      <img src="../static/logo.svg">
     </div>
-    <div class="bg-white shadow-xl rounded-2xl p-8">
-      <header class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">회원가입</h1>
-        <p class="text-sm text-gray-500 mt-1">필수 정보를 입력하고 이메일 인증을 완료하세요.</p>
-      </header>
+    </header>
 
-      <form id="signup-form" class="grid gap-4" action="#" method="post" novalidate>
-        <!-- ID -->
-        <div>
-          <label for="userId" class="block text-sm font-medium text-gray-700">아이디</label>
-          <input id="userId" name="userId" type="text" required autocomplete="username"
-            class="mt-1 w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500"
-            placeholder="아이디를 입력" />
-          <p class="mt-1 text-xs text-gray-500">영문/숫자 4~20자 권장</p>
-        </div>
+    <!-- 카드 -->
+    <main class="rounded-2xl bg-white p-8 shadow-xl">
+      <h1 class="text-2xl font-bold text-gray-900">비밀번호 재설정</h1>
 
-        <!-- PW -->
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
-          <div class="relative">
-            <input id="password" name="password" type="password" required autocomplete="new-password"
-              class="mt-1 w-full rounded-lg border-gray-300 pr-12 focus:border-brand-500 focus:ring-brand-500"
-              placeholder="비밀번호" />
-            <button type="button" id="togglePw"
-              class="absolute inset-y-0 right-2 my-1 px-2 text-sm text-gray-500">표시</button>
-          </div>
-          <p class="mt-1 text-xs text-gray-500">영문/숫자/특수문자 조합 8자 이상 권장</p>
-        </div>
-
-        <!-- 이름 -->
-        <div>
-          <label for="fullName" class="block text-sm font-medium text-gray-700">이름</label>
-          <input id="fullName" name="fullName" type="text" required autocomplete="name"
-            class="mt-1 w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500"
-            placeholder="이름" />
-        </div>
-
+      <form id="resetPw-form" class="mt-6 grid gap-4" action="#" method="post" novalidate>
         <!-- 이메일 + 인증 전송 -->
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">이메일</label>
@@ -110,19 +78,31 @@
           </div>
         </div>
 
-        <!-- 가입하기 -->
-        <div class="pt-2">
-          <button id="btnSubmit" type="submit" disabled
-            class="w-full px-4 py-3 rounded-xl bg-green text-white font-semibold hover:bg-green disabled:opacity-50">가입하기</button>
+        <!-- 변경 비밀번호 입력 -->
+        <div>
+          <label for="newPassword" class="block text-sm font-medium text-gray-700">새 비밀번호</label>
+          <input id="newPassword" name="newPassword" type="text" autocomplete="new-password" required
+            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+            placeholder="새 비밀번호 입력" />
         </div>
+
+        <!-- 찾기 버튼 -->
+        <button type="submit"
+          class="mt-1 w-full rounded-xl bg-green px-4 py-3 font-semibold text-white hover:bg-emerald-700 active:bg-emerald-800">비밀번호
+          재설정</button>
       </form>
+
+      <!-- 보조 링크 (글자만) -->
+      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <a href="/find-id" class="text-gray-600 hover:text-emerald-600 hover:underline">아이디 찾기</a>
+      </div>
 
       <!-- 토스트/알림 -->
       <div id="toast"
         class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-lg">
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 
   <script>
     // ===== 유틸 =====
@@ -134,22 +114,13 @@
       setTimeout(() => t.classList.add('hidden'), 2000);
     };
 
-    // 클라이언트 데모용 코드 저장 (실서비스는 서버 발급/검증 권장)
-    const CODE_KEY = 'signup_email_code';
-    const EXP_KEY = 'signup_email_code_exp';
     let emailVerified = false;
-
     function setVerified(bool) {
       emailVerified = bool;
-      qs('#btnSubmit').disabled = !bool;
+      const btn = qs('#btnSubmit');
+      if (btn) btn.disabled = !bool; // 버튼이 없으면 조용히 무시
     }
 
-    function togglePassword() {
-      const pw = qs('#password');
-      const btn = qs('#togglePw');
-      if (pw.type === 'password') { pw.type = 'text'; btn.textContent = '숨기기'; }
-      else { pw.type = 'password'; btn.textContent = '표시'; }
-    }
 
     function startCooldown(seconds = 60) {
       const btn = qs('#btnSend');
@@ -165,8 +136,6 @@
         }
       }, 1000);
     }
-
-    function genCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
     async function sendCode() {
       const email = qs('#email').value.trim();
@@ -255,43 +224,41 @@
       }
     }
 
-    function onSubmit(e) {
+    document.getElementById('resetPw-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const form = e.currentTarget;
-      
-      const id = qs('#userId').value.trim();
-      const pw = qs('#password').value.trim();
-      const name = qs('#fullName').value.trim();
-      const email = qs('#email').value.trim();
-      if (!id || !pw || !name || !email) { showToast('모든 필드를 입력하세요'); return; }
-      if (!emailVerified) { showToast('이메일 인증을 완료하세요'); return; }
+      const email = document.getElementById('email')?.value?.trim() ?? null;       // loginEmail -> email로 수정
+      const password = document.getElementById('newPassword').value.trim();
 
-      $.ajax({
+      if (!emailVerified) { showToast('이메일 인증을 완료하세요'); return; }
+      if (password == '') { showToast('이메일을 정확히 입력하세요'); return; }
+
+      try {
+        await $.ajax({
           type: "POST",
-          url: "/signup",
+          url: "/pw/reset",
           data: {
-            uid: id,
-            pw: pw,
-            name: name,
-            email: email
+            email: email,
+            password: password
           },
           success: function (res) {
-            showToast("회원 가입이 완료되었습니다");
+            showToast("비밀번호 재설정했습니다");
           },
           error: function (xhr) {
             console.log("status:", xhr.status);
             console.log("body:", xhr.responseText);
-            showToast("회원 가입에 실패했습니다");
+            showToast("비밀번호 재설정 실패하였습니다");
           }
         });
-    }
+      } catch (xhr) {
+        console.log("status:", xhr.status, "body:", xhr.responseText);
+        showToast("비밀번호 재설정 실패하였습니다");
+      }
+    });
 
-    // ===== 이벤트 바인딩 =====
     document.addEventListener('DOMContentLoaded', () => {
-      qs('#togglePw').addEventListener('click', togglePassword);
-      qs('#btnSend').addEventListener('click', sendCode);
-      qs('#btnVerify').addEventListener('click', verifyCode);
-      qs('#signup-form').addEventListener('submit', onSubmit);
+      qs('#btnSend')?.addEventListener('click', sendCode);
+      qs('#btnVerify')?.addEventListener('click', verifyCode);
+
     });
   </script>
 </body>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            green: '#05D182'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>ID찾기</title>
+</head>
+
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <main class="w-full max-w-xl">
+    <!-- 헤더(로고 자리) -->
+    <header class="mb-6 flex items-center gap-3">
+      <div>
+        <img src="../static/logo.svg">
+      </div>
+    </header>
+
+    <!-- 카드 -->
+    <main class="rounded-2xl bg-white p-8 shadow-xl">
+      <h1 class="text-2xl font-bold text-gray-900">ID 찾기</h1>
+      <p class="mt-1 text-sm text-gray-500">이메일과 이름을 입력하세요.</p>
+
+      <form id="login-form" class="mt-6 grid gap-4" action="#" method="post" novalidate>
+        <!-- 이메일 입력 -->
+        <div>
+          <label for="loginEmail" class="block text-sm font-medium text-gray-700">이메일</label>
+          <input id="loginEmail" name="loginEmail" type="text" autocomplete="username" required
+            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+            placeholder="이메일 입력" />
+        </div>
+
+        <!-- 이름 입력 -->
+        <div>
+          <label for="loginName" class="block text-sm font-medium text-gray-700">이름</label>
+          <div class="relative">
+            <input id="loginName" name="name" type="text" autocomplete="current-name" required
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 pr-12 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+              placeholder="이름 입력" />
+          </div>
+        </div>
+
+        <!-- 찾기 버튼 -->
+        <button type="submit"
+          class="mt-1 w-full rounded-xl bg-green px-4 py-3 font-semibold text-white hover:bg-emerald-700 active:bg-emerald-800">ID
+          찾기</button>
+      </form>
+
+      <!-- 보조 링크 (글자만) -->
+      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <a href="/reset-password" class="text-gray-600 hover:text-emerald-600 hover:underline">비밀번호 재설정</a>
+      </div>
+
+    </main>
+    </div>
+
+    <!-- JS: 비밀번호 표시/숨기기 -->
+    <script>
+      // ===== 유틸 =====
+      const qs = (s, el = document) => el.querySelector(s);
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const showToast = (msg) => {
+        const t = qs('#toast');
+        t.textContent = msg; t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 2000);
+      };
+
+      async function sendId() {
+        const email = qs('#loginEmail').value.trim();
+        const name = document.getElementById('loginName').value.trim();
+
+        if (!emailRe.test(email)) { showToast('올바른 이메일을 입력하세요'); return; }
+
+        // 서버로 이메일 전송 (Flask /id/find 사용)
+        try {
+          const res = await $.ajax({
+            type: "POST",
+            url: "/id/find",
+            data: {
+              email: email,
+              name: name,
+              content: "공구조쿠 아이디",
+              html: `
+                    <div style="font-family:system-ui,Segoe UI,Roboto,Apple SD Gothic Neo,sans-serif">
+                      <p>기존 ID 입니다.</p>
+                      <p style="font-size:20px;font-weight:700">ID: <span>findId</span></p>
+                    </div>`
+            },
+            success: function (res) {
+              showToast("ID 찾기에 성공했습니다");
+            },
+            error: function (xhr) {
+              console.log("status:", xhr.status);
+              console.log("body:", xhr.responseText);
+              showToast("ID 찾기에 실패했습니다");
+            }
+          });
+        } catch (e) {
+          console.log(e);
+          showToast("ID 찾기에 실패했습니다", e);
+        }
+
+      }
+
+      document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendId()
+      });
+    </script>
+</body>
+
+</html>

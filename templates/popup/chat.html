@@ -4,32 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>그룹 채팅</title>
+    
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 스크롤바 디자인 */
-        #chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
 
-        #chat-messages::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        #chat-messages::-webkit-scrollbar-track {
-            background-color: #f1f5f9;
-        }
-
-        /* 커스텀 트랜지션을 위한 스타일 */
-        #chat-modal-content {
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-        }
-    </style>
+    <title>그룹 채팅</title>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100">
 
     <!-- 메인 페이지 컨텐츠 -->
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
