@@ -14,6 +14,8 @@
   <!-- 구글폰트 -->
   <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
 
+  <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- tailwindcss -->
   <script>
     // Tailwind 커스텀
@@ -27,7 +29,6 @@
       }
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
 
   <title>비밀번호 재설정</title>
 
@@ -94,7 +95,7 @@
 
       <!-- 보조 링크 (글자만) -->
       <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
-        <a href="/find-id" class="text-gray-600 hover:text-emerald-600 hover:underline">아이디 찾기</a>
+        <a href="{{ url_for('to_find_id') }}" class="text-gray-600 hover:text-emerald-600 hover:underline">아이디 찾기</a>
       </div>
 
       <!-- 토스트/알림 -->
