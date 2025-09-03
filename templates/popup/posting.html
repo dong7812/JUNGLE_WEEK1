@@ -5,13 +5,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- tailwindcss -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <link rel="stylesheet" type="text/css" href="/static/main.css">
-
   <title>Posting Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="flex items-center justify-center h-screen bg-white">
@@ -33,14 +28,16 @@
       </div>
     </div>
 
-    <!-- 임시 ID -->
     <form id="post-form" class="space-y-6">
       <div>
-        <label for="userID" class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
-        <input type="text" id="userID" name="userID" placeholder="ID 입력"
+        <label for="uid" class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
+        <!-- user:ID test test test test test test test test test test  -->
+        <input type="text" id="uid" name="uid" value="{{ email }}" readonly
           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          required>
+          required readonly>
+
       </div>
+
       <!-- 폼 -->
       <form id="post-form" class="space-y-6">
         <div>
@@ -89,96 +86,190 @@
       </form>
   </div>
 
-  <script>
-    // ====== 폼 내부 로직(카테고리/태그/유효성/서버 전송) ======
-    const postForm = document.getElementById('post-form');
-    const timeSelect = document.getElementById('time');
-    const peopleSelect = document.getElementById('people');
-    const categoryRadios = document.querySelectorAll('input[name="category"]');
-    const urlInput = document.getElementById('url');
-    const tagsToggleGroup = document.getElementById('tags-toggle-group');
+<script>
+  // ====== 공통 엘리먼트 ======
+  const postForm       = document.getElementById('post-form');
+  const timeSelect     = document.getElementById('time');
+  const peopleSelect   = document.getElementById('people');
+  const categoryRadios = document.querySelectorAll('input[name="category"]');
+  const urlInput       = document.getElementById('url');
+  const tagsToggleGroup= document.getElementById('tags-toggle-group');
+  const uidInputEl     = document.getElementById('uid'); // 아이디 입력창
 
-    const tagData = {
-      '공동구매': ['욕실용품', '식료품', '뷰티', '가전', '그외'],
-      '공동배달': ['한식', '중식', '양식', '야식', '그외']
-    };
+  // ====== 모드 판별 (생성/수정) ======
+  const params = new URLSearchParams(location.search);
+  const postId = params.get('id'); // 있으면 수정모드
 
-    function setupSelect(select, defaultText, max, unit) {
-      select.innerHTML = '';
-      const def = document.createElement('option');
-      def.value = ''; def.textContent = defaultText; def.disabled = true; def.selected = true;
-      select.appendChild(def);
-      for (let i = 1; i <= max; i++) {
-        const o = document.createElement('option');
-        o.value = String(i); o.textContent = `${i} ${unit}`;
-        select.appendChild(o);
-      }
+  // ====== 데이터 ======
+  const tagData = {
+    '공동구매': ['욕실용품', '식료품', '뷰티', '가전', '그외'],
+    '공동배달': ['한식', '중식', '양식', '야식', '그외']
+  };
+
+  // ====== 유틸 ======
+  function setupSelect(select, defaultText, max, unit) {
+    select.innerHTML = '';
+    const def = document.createElement('option');
+    def.value = ''; def.textContent = defaultText; def.disabled = true; def.selected = true;
+    select.appendChild(def);
+    for (let i = 1; i <= max; i++) {
+      const o = document.createElement('option');
+      o.value = String(i); o.textContent = `${i} ${unit}`;
+      select.appendChild(o);
     }
-    setupSelect(timeSelect, '시간을 선택하세요', 24, '시간');
-    setupSelect(peopleSelect, '인원수를 선택하세요', 10, '명');
+  }
 
-    function updateTagButtons(category) {
-      tagsToggleGroup.innerHTML = '';
-      (tagData[category] || []).forEach(tag => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'toggle-btn bg-gray-100 text-gray-700 font-semibold py-1 px-3 rounded-full hover:bg-gray-200';
-        btn.dataset.value = tag;
-        btn.textContent = `#${tag}`;
-        tagsToggleGroup.appendChild(btn);
-      });
+  function updateTagButtons(category) {
+    tagsToggleGroup.innerHTML = '';
+    (tagData[category] || []).forEach(tag => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn bg-gray-100 text-gray-700 font-semibold py-1 px-3 rounded-full hover:bg-gray-200';
+      btn.dataset.value = tag;
+      btn.textContent = `#${tag}`;
+      tagsToggleGroup.appendChild(btn);
+    });
+  }
+
+  function setCategoryUI(category) {
+    if (category === '공동배달') {
+      urlInput.disabled = true; urlInput.required = false; urlInput.value = '';
+      urlInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+    } else {
+      urlInput.disabled = false; urlInput.required = true;
+      urlInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
     }
-    function setCategoryUI(category) {
-      if (category === '공동배달') {
-        urlInput.disabled = true; urlInput.required = false; urlInput.value = '';
-        urlInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+    updateTagButtons(category);
+  }
+
+  function selectCategory(category) {
+    categoryRadios.forEach(r => { r.checked = (r.value === category); });
+    setCategoryUI(category);
+  }
+
+  function selectTag(tagValue) {
+    const btns = [...tagsToggleGroup.querySelectorAll('.toggle-btn')];
+    btns.forEach(b => {
+      if (b.dataset.value === tagValue) {
+        b.classList.add('bg-emerald-500','text-white');
+        b.classList.remove('bg-gray-100','text-gray-700');
       } else {
-        urlInput.disabled = false; urlInput.required = true;
-        urlInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        b.classList.remove('bg-emerald-500','text-white');
+        b.classList.add('bg-gray-100','text-gray-700');
       }
-      updateTagButtons(category);
+    });
+  }
+
+  // ====== 초기 UI 구성 ======
+  setupSelect(timeSelect, '시간을 선택하세요', 24, '시간');
+  setupSelect(peopleSelect, '인원수를 선택하세요', 10, '명');
+  selectCategory('공동구매'); // 기본값
+  categoryRadios.forEach(r => r.addEventListener('change', e => setCategoryUI(e.target.value)));
+
+  // 태그 단일 선택
+  tagsToggleGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toggle-btn'); if (!btn) return;
+    selectTag(btn.dataset.value);
+  });
+
+  // ====== 수정모드: 기존 데이터 로드 ======
+  async function loadPostForEdit(id) {
+    try {
+      const res = await fetch(`/api/posts/${encodeURIComponent(id)}`);
+      const json = await res.json();
+      if (!json.success) throw new Error('load failed');
+
+      const p = json.post || {};
+      // 1) 카테고리 먼저 동기화 (태그 버튼 생성 포함)
+      const category = p.category || '공동구매';
+      selectCategory(category);
+
+      // 2) 태그 선택 동기화
+      if (p.tag) selectTag(p.tag);
+
+      // 3) 나머지 폼 값 채우기 (input name/id에 맞춰 조정)
+      postForm.elements['title'].value      = p.title      || '';
+      postForm.elements['people'].value     = p.people     || '';
+      postForm.elements['time'].value       = p.time       || '';
+      postForm.elements['meta_image'].value = p.meta_image || '';
+      postForm.elements['url'].value        = p.url        || '';
+      postForm.elements['desc'].value       = p.desc       || '';
+
+      // uid(작성자) 필드가 있다면
+      if (uidInputEl && p.uid) uidInputEl.value = p.uid;
+    } catch (e) {
+      console.error(e);
+      alert('기존 게시글을 불러오지 못했습니다.');
     }
-    setCategoryUI('공동구매');
-    categoryRadios.forEach(r => r.addEventListener('change', e => setCategoryUI(e.target.value)));
+  }
 
-    // 태그 단일 선택
-    tagsToggleGroup.addEventListener('click', (e) => {
-      const btn = e.target.closest('.toggle-btn'); if (!btn) return;
-      [...tagsToggleGroup.querySelectorAll('.toggle-btn')].forEach(b => {
-        b.classList.remove('bg-emerald-500', 'text-white');
-        b.classList.add('bg-gray-100', 'text-gray-700');
+  // ====== 제출: 생성/수정 분기 ======
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const selectedTagBtn = tagsToggleGroup.querySelector('.bg-emerald-500');
+    if (!selectedTagBtn) { alert('태그를 선택해주세요.'); return; }
+    if (!postForm.checkValidity()) { postForm.reportValidity(); return; }
+
+    const form = new FormData(postForm);
+    const payload = Object.fromEntries(form.entries());
+    payload.tag = selectedTagBtn.dataset.value;
+
+    // 카테고리 라디오 값 추가(일부 브라우저에서 FormData로 빠질 수 있음)
+    const checked = [...categoryRadios].find(r => r.checked);
+    payload.category = checked ? checked.value : '공동구매';
+
+    try {
+      const url    = postId ? `/api/posts/${encodeURIComponent(postId)}` : '/api/posts';
+      const method = postId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      btn.classList.add('bg-emerald-500', 'text-white');
-      btn.classList.remove('bg-gray-100', 'text-gray-700');
-    });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || '저장 실패');
 
-    // 제출 → 서버 저장 → 부모(index)에게 알림
-    postForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const selectedTag = tagsToggleGroup.querySelector('.bg-emerald-500');
-      if (!selectedTag) { alert('태그를 선택해주세요.'); return; }
-      if (!postForm.checkValidity()) { postForm.reportValidity(); return; }
-
-      const form = new FormData(postForm);
-      const payload = Object.fromEntries(form.entries());
-      payload.tag = selectedTag.dataset.value;
-
+      // 부모(index.html/mypage)에게 알림
+      const msgType = postId ? 'POST_UPDATED' : 'POST_CREATED';
+      const postObj = json.post || { _id: postId, ...payload };
       try {
-        const res = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error || '저장 실패');
+        window.parent.postMessage({ type: msgType, post: postObj }, '*');
+      } catch(_) {}
 
-        // 부모(index.html)에 신규 포스트 전달
-        window.parent.postMessage({ type: 'POST_CREATED', post: json.post }, '*');
-      } catch (err) {
-        alert(err.message);
+      // 돌아가기 (iframe이든 단독페이지든 둘 다 커버)
+      if (document.referrer) {
+        history.back();
+      } else {
+        window.location.assign('/mypage'); // 마이페이지 경로에 맞게 조정
       }
-    });
-  </script>
+    } catch (err) {
+      console.error(err);
+      alert(err.message || '저장 중 오류가 발생했습니다.');
+    }
+  });
+
+  // ====== 아이디 입력창에 임시 email 채우기 ======
+  window.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const res = await fetch("/api/users");
+      const { success, users } = await res.json();
+      if (success && Array.isArray(users) && users.length && uidInputEl) {
+        uidInputEl.value = users[2]?.email || users[0]?.email || '';
+      }
+    } catch (e) { console.error(e); }
+  });
+
+  // ====== 페이지 최초 로드 플로우 ======
+  (async () => {
+    if (postId) {
+      // 수정 모드면 기존 데이터 먼저 로드
+      await loadPostForEdit(postId);
+    }
+  })();
+</script>
+
 </body>
 
 </html>
