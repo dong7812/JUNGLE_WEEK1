@@ -145,6 +145,7 @@ def do_login():
                 'exp': datetime.now(timezone.utc) + timedelta(hours=int(app.config.get('JWT_EXPIRATION_HOURS', 1)))
             }
             token = jwt.encode(payload, os.environ.get('SECRET_KEY', 'dev-secret'), algorithm='HS256')
+            session['uid'] = uid
             return jsonify({'result': 'success', 'message': '로그인 성공', 'token': token})
         else:
             return jsonify({'result': 'fail', 'message': '이메일 또는 비밀번호가 올바르지 않습니다.'}), 401
@@ -317,7 +318,7 @@ def list_posts():
         if isinstance(d.get("createdAt"), datetime):
             d["createdAt"] = d["createdAt"].isoformat()
         docs.append(d)
-    return jsonify(success=True, posts=docs)
+    return jsonify(success=True, posts=docs), 200
 
 def extract_meta_image(page_url: str) -> str:
     try:
@@ -432,6 +433,11 @@ def to_reset_pw():
 @app.route("/find_id")
 def to_find_id():
     return render_template("sign_in/find_id.html")
+
+@app.route("/mypage")
+def to_my_page():
+    uid = session.get("uid")
+    return render_template("mypage/mypage.html", uid=uid)
     
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)
