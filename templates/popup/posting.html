@@ -247,7 +247,8 @@
     } catch(_) {}
 
     if (document.referrer) {
-      history.back();
+      window.location.assign('/');
+      window.reload();
     } else {
       window.location.assign('/mypage');
     }
