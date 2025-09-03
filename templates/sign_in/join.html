@@ -48,11 +48,19 @@
         <!-- ID -->
         <div>
           <label for="userId" class="block text-sm font-medium text-gray-700">아이디</label>
-          <input id="userId" name="userId" type="text" required autocomplete="username"
-            class="mt-1 w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500"
-            placeholder="아이디를 입력" />
+          <div class="mt-1 flex gap-2">
+            <input id="userId" name="userId" type="text" required autocomplete="username"
+              class="w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500"
+              placeholder="아이디를 입력" />
+            <button type="button" id="btnCheckId"
+              class="shrink-0 px-4 py-2 rounded-lg bg-green text-white hover:bg-green disabled:opacity-50">
+              중복 확인
+            </button>
+          </div>
           <p class="mt-1 text-xs text-gray-500">영문/숫자 4~20자 권장</p>
+          <p id="checkIdMsg" class="mt-1 text-xs text-gray-500"></p>
         </div>
+
 
         <!-- PW -->
         <div>
@@ -131,6 +139,56 @@
     };
 
     let emailVerified = false;
+
+    let idChecked = false;   // 아이디 중복 확인 여부
+
+    function setVerified(bool) {
+      emailVerified = bool;
+      updateSubmitState();
+    }
+
+    function setIdChecked(bool) {
+      idChecked = bool;
+      updateSubmitState();
+    }
+
+    function updateSubmitState() {
+      // 이메일 인증과 ID 확인이 모두 완료된 경우만 가입 버튼 활성화
+      qs('#btnSubmit').disabled = !(emailVerified && idChecked);
+    }
+
+    async function checkId() {
+      const id = qs('#userId').value.trim();
+      if (!id) {
+        showToast("아이디를 입력하세요");
+        return;
+      }
+
+      try {
+        const res = await $.ajax({
+          type: "POST",
+          url: "/check/id",
+          dataType: "json",
+          data: { uid: id }
+        });
+
+        if (res.ok) {
+          qs('#checkIdMsg').textContent = "사용 가능한 아이디입니다.";
+          qs('#checkIdMsg').className = "mt-1 text-xs text-green-600";
+          setIdChecked(true);
+        } else {
+          qs('#checkIdMsg').textContent = "이미 사용 중인 아이디입니다.";
+          qs('#checkIdMsg').className = "mt-1 text-xs text-red-600";
+          showToast("다른 아이디를 입력하세요");
+          setIdChecked(false);
+        }
+      } catch (xhr) {
+        console.log("status:", xhr.status, "body:", xhr.responseText);
+        showToast("중복 확인 요청 실패");
+        setIdChecked(false);
+      }
+    }
+
 
     function setVerified(bool) {
       emailVerified = bool;
@@ -250,39 +308,52 @@
 
     function onSubmit(e) {
       e.preventDefault();
-      const form = e.currentTarget;
-      
+
       const id = qs('#userId').value.trim();
       const pw = qs('#password').value.trim();
       const name = qs('#fullName').value.trim();
       const email = qs('#email').value.trim();
-      if (!id || !pw || !name || !email) { showToast('모든 필드를 입력하세요'); return; }
-      if (!emailVerified) { showToast('이메일 인증을 완료하세요'); return; }
+
+      if (!id || !pw || !name || !email) {
+        showToast('모든 필드를 입력하세요');
+        return;
+      }
+      if (!idChecked) {
+        showToast('아이디 중복 확인을 완료하세요');
+        return;
+      }
+      if (!emailVerified) {
+        showToast('이메일 인증을 완료하세요');
+        return;
+      }
 
       $.ajax({
-          type: "POST",
-          url: "/add/user",
-          data: {
-            uid: id,
-            pw: pw,
-            name: name,
-            email: email
-          },
-          success: function (res) {
-            showToast("회원 가입이 완료되었습니다");
-          },
-          error: function (xhr) {
-            console.log("status:", xhr.status);
-            console.log("body:", xhr.responseText);
-            showToast("회원 가입에 실패했습니다");
-          }
-        });
+        type: "POST",
+        url: "/add/user",
+        data: {
+          uid: id,
+          pw: pw,
+          name: name,
+          email: email
+        },
+        success: function (res) {
+          showToast("회원 가입이 완료되었습니다");
+          window.location.href = '/login';
+        },
+        error: function (xhr) {
+          console.log("status:", xhr.status);
+          console.log("body:", xhr.responseText);
+          showToast("회원 가입에 실패했습니다");
+        }
+      });
     }
+
 
     // ===== 이벤트 바인딩 =====
     document.addEventListener('DOMContentLoaded', () => {
       qs('#togglePw').addEventListener('click', togglePassword);
       qs('#btnSend').addEventListener('click', sendCode);
+      qs('#btnCheckId').addEventListener('click', checkId);
       qs('#btnVerify').addEventListener('click', verifyCode);
       qs('#join-form').addEventListener('submit', onSubmit);
     });
