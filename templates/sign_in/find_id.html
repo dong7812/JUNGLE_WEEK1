@@ -14,7 +14,8 @@
   <!-- 구글폰트 -->
   <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
 
-  <script>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -25,7 +26,6 @@
       }
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <title>ID찾기</title>
 </head>
 
@@ -70,7 +70,7 @@
 
       <!-- 보조 링크 (글자만) -->
       <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
-        <a href="/reset-password" class="text-gray-600 hover:text-emerald-600 hover:underline">비밀번호 재설정</a>
+        <a href="{{ url_for('to_reset_pw') }}" class="text-gray-600 hover:text-emerald-600 hover:underline">비밀번호 재설정</a>
       </div>
 
     </main>
