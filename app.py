@@ -285,7 +285,7 @@ def create_post():
     people   = int(payload.get("people") or 0)
     tag      = (payload.get("tag") or "").strip()
     url      = (payload.get("url") or "").strip()
-    meta_image = ""
+    meta_image = extract_meta_image(url) if url else ""
     createdAt = datetime.utcnow()
 
     doc = {
@@ -464,6 +464,71 @@ def detail_page(_id):
     if isinstance(item.get("createdAt"), datetime):
         item["createdAt"] = item["createdAt"].isoformat()
     return render_template("/product/detail.html", item=item)
+
+def _first(*vals):
+    for v in vals:
+        if v and str(v).strip():
+            return str(v).strip()
+    return ""
+
+def _pick_lazy_src(tag):
+    return _first(
+        tag.get("content"), tag.get("src"), tag.get("data-src"),
+        tag.get("data-original"), tag.get("data-lazy"),
+        tag.get("data-url"), tag.get("href"),
+    )
+
+def _is_image_url(u: str) -> bool:
+    try:
+        h = requests.head(u, headers=UA, timeout=5, allow_redirects=True)
+        ct = h.headers.get("Content-Type", "")
+        return h.ok and ct.startswith("image/")
+    except Exception:
+        return False
+def extract_meta_image(page_url: str) -> str:
+    try:
+        r = requests.get(page_url, headers=UA, timeout=8, allow_redirects=True)
+        r.raise_for_status()
+    except Exception:
+        return ""
+    real_url = r.url
+    soup = BeautifulSoup(r.text, "html.parser")
+    # 1) og/twitter/link 우선
+    for sel in ['meta[property="og:image"]',
+                'meta[property="og:image:secure_url"]',
+                'meta[name="twitter:image"]',
+                'link[rel="image_src"]']:
+        tag = soup.select_one(sel)
+        if not tag:
+            continue
+        raw = _pick_lazy_src(tag)
+        if not raw:
+            continue
+        if raw.startswith("//"):
+            raw = "https:" + raw
+        cand = urljoin(real_url, raw)
+        if _is_image_url(cand):
+            return cand
+    # 2) 대표 이미지 후보 스캔
+    hints = ("main", "product", "goods", "thumb", "detail", "gallery", "image")
+    imgs = []
+    for img in soup.find_all("img"):
+        cls = " ".join(img.get("class", []))
+        id_ = img.get("id", "")
+        if any(h in (cls + id_).lower() for h in hints):
+            imgs.append(img)
+    if not imgs:
+        imgs = soup.find_all("img")
+    for img in imgs[:30]:
+        raw = _pick_lazy_src(img)
+        if not raw:
+            continue
+        if raw.startswith("//"):
+            raw = "https:" + raw
+        cand = urljoin(real_url, raw)
+        if _is_image_url(cand):
+            return cand
+    return ""
 
 @app.route("/login")
 def login():
