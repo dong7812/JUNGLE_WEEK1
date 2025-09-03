@@ -1,30 +1,24 @@
-from flask import Flask, render_template, jsonify, request, session, make_response, redirect, url_for, g
-from flask.json.provider import JSONProvider
-
-from pymongo import MongoClient
-
 import smtplib, ssl, time, secrets, os
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-from datetime import datetime, timedelta, timezone
 import requests 
-from bs4 import BeautifulSoup
-
-from urllib.parse import urljoin
-
 import re
 import jwt
-from utill import encrypt, decrypt
+import json
+import traceback
+
+from flask import Flask, render_template, jsonify, request, session, make_response, redirect, url_for, g
+from flask.json.provider import JSONProvider
+from pymongo import MongoClient
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime, timedelta, timezone
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 from dotenv import load_dotenv
-
-import json
 from bson import ObjectId
-
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from functools import wraps
+
 
 load_dotenv()
 
@@ -55,7 +49,7 @@ def home():
     return render_template('main.html', posts = posts)
 
 # --- JWT 관련 함수 (헤더 방식) ---
-from bson import ObjectId
+
 
 def get_current_user():
     if hasattr(g, 'user'):
@@ -150,7 +144,7 @@ def do_login():
         else:
             return jsonify({'result': 'fail', 'message': '이메일 또는 비밀번호가 올바르지 않습니다.'}), 401
     except Exception as e:
-        import traceback
+        
         traceback.print_exc()
         return jsonify({'result': 'error', 'message': str(e)}), 500
 
@@ -234,9 +228,9 @@ def reset_pw():
     newPassword = (request.form.get('password') or '').strip()
     email = (request.form.get('email') or '').strip()
     
-    encryptPw = encrypt(newPassword, os.environ.get('SECRET_KEY'))
+    password_hash = generate_password_hash(newPassword)
     
-    result = db.user.update_one({'email': email}, {"$set": {'pw': encryptPw}})
+    result = db.user.update_one({'email': email}, {"$set": {'password_hash': password_hash}})
     
     if(result.modified_count > 0):
         return jsonify({'result': 'success'})        
