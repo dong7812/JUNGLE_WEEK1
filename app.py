@@ -285,7 +285,7 @@ def create_post():
     people   = int(payload.get("people") or 0)
     tag      = (payload.get("tag") or "").strip()
     url      = (payload.get("url") or "").strip()
-    meta_image = ""  # extract_meta_image(url) 가능
+    meta_image = ""
     createdAt = datetime.utcnow()
 
     doc = {
@@ -389,48 +389,106 @@ def leave_post(_id):
     updated["_id"] = str(updated["_id"])
     return jsonify(success=True, post=updated), 200
 
-@app.route("/api/user", methods=["GET"])
-def api_user():
-    uid = session.get("uid", "")  # 로그인 시 session['uid']에 넣었음
-    if not uid:
-        return jsonify(success=False, message="not logged in"), 401
-
-    user = db.user.find_one({"uid": uid}, {"_id": 0, "uid": 1, "email": 1, "name": 1, "username": 1})
-    if not user:
-        # uid만 세션에 있고 user 컬렉션에 없을 가능성 대비
-        user = {"uid": uid, "email": uid, "name": uid.split("@")[0], "username": uid.split("@")[0]}
-    name = user.get("name") or user.get("username") or uid
-    email = user.get("email") or uid
-    return jsonify(success=True, user={"uid": uid, "name": name, "email": email})
-
-
 # 글 목록
 
 @app.route("/api/posts", methods=["GET"])
 def list_posts():
+
     q = {}
     uid = (request.args.get("uid") or "").strip()
     if uid:
         q["userID"] = uid  # ← 글 저장 시 userID(=email/uid)로 저장했으니 여기로 매칭
 
+
     docs = []
-    for d in posts_col.find(q).sort("createdAt", -1):
+    for d in posts_col.find().sort("createdAt", -1):
         d["_id"] = str(d["_id"])
         if isinstance(d.get("createdAt"), datetime):
             d["createdAt"] = d["createdAt"].isoformat()
         docs.append(d)
     return jsonify(success=True, posts=docs), 200
 
-
-@app.route("/api/posts/<_id>", methods=["DELETE"])
-def delete_post(_id):
+def extract_meta_image(page_url: str) -> str:
     try:
-        oid = ObjectId(_id)
-        result = posts_col.delete_one({"_id": oid})
+        r = requests.get(page_url, headers=UA, timeout=8, allow_redirects=True)
+        r.raise_for_status()
     except Exception:
-        result = posts_col.delete_one({"_id": _id})
-    ok = result.deleted_count > 0
-    return jsonify(success=ok)
+        return ""
+    real_url = r.url
+    soup = BeautifulSoup(r.text, "html.parser")
+    # 1) og/twitter/link 우선
+    for sel in ['meta[property="og:image"]',
+                'meta[property="og:image:secure_url"]',
+                'meta[name="twitter:image"]',
+                'link[rel="image_src"]']:
+        tag = soup.select_one(sel)
+        if not tag:
+            continue
+        raw = _pick_lazy_src(tag)
+        if not raw:
+            continue
+        if raw.startswith("//"):
+            raw = "https:" + raw
+        cand = urljoin(real_url, raw)
+        if _is_image_url(cand):
+            return cand
+    # 2) 대표 이미지 후보 스캔
+    hints = ("main", "product", "goods", "thumb", "detail", "gallery", "image")
+    imgs = []
+    for img in soup.find_all("img"):
+        cls = " ".join(img.get("class", []))
+        id_ = img.get("id", "")
+        if any(h in (cls + id_).lower() for h in hints):
+            imgs.append(img)
+    if not imgs:
+        imgs = soup.find_all("img")
+    for img in imgs[:30]:
+        raw = _pick_lazy_src(img)
+        if not raw:
+            continue
+        if raw.startswith("//"):
+            raw = "https:" + raw
+        cand = urljoin(real_url, raw)
+        if _is_image_url(cand):
+            return cand
+    return ""
+
+def _pick_lazy_src(tag):
+    return _first(
+        tag.get("content"), tag.get("src"), tag.get("data-src"),
+        tag.get("data-original"), tag.get("data-lazy"),
+        tag.get("data-url"), tag.get("href"),
+    )
+    
+def _is_image_url(u: str) -> bool:
+    try:
+        h = requests.head(u, headers=UA, timeout=5, allow_redirects=True)
+        ct = h.headers.get("Content-Type", "")
+        return h.ok and ct.startswith("image/")
+    except Exception:
+        return False
+
+def _first(*vals):
+    for v in vals:
+        if v and str(v).strip():
+            return str(v).strip()
+    return "" 
+
+@app.route("/check/id", methods=["POST"])
+def check_id():
+    uid = request.form.get("uid")
+    if not uid:
+        return jsonify({"ok": False, "msg": "no uid"}), 400
+
+    # DB에서 해당 uid 존재 여부 확인
+    existing = db.user.find_one({"uid": uid})
+    
+    if existing:
+        # 이미 존재하는 아이디
+        return jsonify({"ok": False, "msg": "duplicated"})
+    else:
+        # 사용 가능한 아이디
+        return jsonify({"ok": True, "msg": "available"})
 
 
 @app.route("/detail/<_id>", methods=["GET"])
