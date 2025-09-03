@@ -131,10 +131,12 @@ def add_user():
 def do_login():
     try:
         data = request.get_json()
-        email = data.get('email')
+        uid = data.get('uid')
         password = data.get('password')
+        
+        print(f"uid :", uid)
 
-        user = db.user.find_one({"email": email})
+        user = db.user.find_one({"uid": uid})
 
         if user and check_password_hash(user['password_hash'], password):
             payload = {
