@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+  <!-- tailwindcss -->
+  <script>
+    // Tailwind 커스텀
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            green: '#05D182'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <title>비밀번호 재설정</title>
+
+</head>
+
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <main class="w-full max-w-xl">
+    <!-- 헤더(로고 자리) -->
+    <header class="mb-6 flex items-center gap-3">
+       <div>
+      <img src="../static/logo.svg">
+    </div>
+    </header>
+
+    <!-- 카드 -->
+    <main class="rounded-2xl bg-white p-8 shadow-xl">
+      <h1 class="text-2xl font-bold text-gray-900">비밀번호 재설정</h1>
+
+      <form id="resetPw-form" class="mt-6 grid gap-4" action="#" method="post" novalidate>
+        <!-- 이메일 + 인증 전송 -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">이메일</label>
+          <div class="mt-1 flex gap-2">
+            <input id="email" name="email" type="email" required autocomplete="email"
+              class="w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500"
+              placeholder="you@example.com" />
+            <button type="button" id="btnSend"
+              class="shrink-0 px-4 py-2 rounded-lg bg-green text-white hover:bg-green disabled:opacity-50">
+              번호 발급
+            </button>
+          </div>
+          <p id="sendMsg" class="mt-1 text-xs text-gray-500">이메일로 6자리 인증번호를 전송합니다.</p>
+        </div>
+
+        <!-- 인증번호 입력 + 확인 -->
+        <div>
+          <label for="emailCodeInput" class="block text-sm font-medium text-gray-700">이메일 인증번호</label>
+          <div class="mt-1 flex gap-2">
+            <input id="emailCodeInput" name="emailCodeInput" type="text" inputmode="numeric" pattern="\\d{6}"
+              maxlength="6" disabled
+              class="w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500 disabled:bg-gray-100"
+              placeholder="6자리" />
+            <button type="button" id="btnVerify" disabled
+              class="shrink-0 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50">확인</button>
+          </div>
+          <div class="mt-1 text-xs">
+            <span id="verifyMsg" class="text-gray-500">번호 발급 후 10분 이내에 입력하세요.</span>
+          </div>
+        </div>
+
+        <!-- 변경 비밀번호 입력 -->
+        <div>
+          <label for="newPassword" class="block text-sm font-medium text-gray-700">새 비밀번호</label>
+          <input id="newPassword" name="newPassword" type="text" autocomplete="new-password" required
+            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+            placeholder="새 비밀번호 입력" />
+        </div>
+
+        <!-- 찾기 버튼 -->
+        <button type="submit"
+          class="mt-1 w-full rounded-xl bg-green px-4 py-3 font-semibold text-white hover:bg-emerald-700 active:bg-emerald-800">비밀번호
+          재설정</button>
+      </form>
+
+      <!-- 보조 링크 (글자만) -->
+      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <a href="/find-id" class="text-gray-600 hover:text-emerald-600 hover:underline">아이디 찾기</a>
+      </div>
+
+      <!-- 토스트/알림 -->
+      <div id="toast"
+        class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-lg">
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== 유틸 =====
+    const qs = (s, el = document) => el.querySelector(s);
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const showToast = (msg) => {
+      const t = qs('#toast');
+      t.textContent = msg; t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2000);
+    };
+
+    let emailVerified = false;
+    function setVerified(bool) {
+      emailVerified = bool;
+      const btn = qs('#btnSubmit');
+      if (btn) btn.disabled = !bool; // 버튼이 없으면 조용히 무시
+    }
+
+
+    function startCooldown(seconds = 60) {
+      const btn = qs('#btnSend');
+      let left = seconds;
+      btn.disabled = true;
+      btn.textContent = `재전송 ${left}s`;
+      const timer = setInterval(() => {
+        left--; btn.textContent = `재전송 ${left}s`;
+        if (left <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = '번호 발급';
+        }
+      }, 1000);
+    }
+
+    async function sendCode() {
+      const email = qs('#email').value.trim();
+      if (!emailRe.test(email)) { showToast('올바른 이메일을 입력하세요'); return; }
+
+      // UI 상태
+      qs('#emailCodeInput').disabled = false;
+      qs('#btnVerify').disabled = false;
+      setVerified(false);
+      qs('#verifyMsg').textContent = '인증번호가 전송되었습니다. 10분 내 입력해 주세요.';
+      startCooldown(60);
+
+      // 서버로 이메일 전송 (Flask /code/send 사용)
+      try {
+        const res = await $.ajax({
+          type: "POST",
+          url: "/code/send",
+          data: {
+            email: email,
+            content: "공구조쿠 인증 번호",
+            html: `
+                    <div style="font-family:system-ui,Segoe UI,Roboto,Apple SD Gothic Neo,sans-serif">
+                      <p>아래 인증번호를 입력해 주세요.</p>
+                      <p style="font-size:20px;font-weight:700">인증번호: <span>verified</span></p>
+                      <p style="color:#6b7280">유효시간: 10분</p>
+                    </div>`
+          },
+          success: function (res) {
+            showToast("인증번호를 전송했습니다");
+          },
+          error: function (xhr) {
+            console.log("status:", xhr.status);
+            console.log("body:", xhr.responseText);
+            showToast("인증번호 전송에 실패했습니다");
+          }
+        });
+      } catch (e) {
+        console.log(e);
+        showToast("인증번호 전송이 실패했습니다", e);
+      }
+
+    }
+
+    async function verifyCode() {
+      const input = qs('#emailCodeInput').value.trim();
+      const email = (qs('#email')?.value || '').trim(); // 서버가 이메일도 확인한다면 함께 전송
+
+      if (!input) { showToast('인증번호를 입력하세요'); return; }
+
+      try {
+        const res = await $.ajax({
+          type: "POST",
+          url: "/code/verified",
+          dataType: "json",
+          timeout: 15000,
+          data: { input: input, email: email } // 서버가 email을 안 쓰면 input만 보내도 OK
+        });
+
+        if (res.ok) {
+          qs('#verifyMsg').textContent = '이메일 인증 완료!';
+          qs('#verifyMsg').className = 'text-xs text-green-600';
+          setVerified(true);
+          return;
+        }
+
+        // 실패 케이스 매핑 (서버 msg 값에 맞춰 UI 문구 설정)
+        setVerified(false);
+        const msg = res.msg || '인증 실패';
+        if (msg === 'not requested') {
+          qs('#verifyMsg').textContent = '먼저 인증번호를 발급하세요';
+          qs('#verifyMsg').className = 'text-xs text-red-600';
+        } else if (msg === 'expired') {
+          qs('#verifyMsg').textContent = '인증번호가 만료되었습니다. 다시 발급해 주세요.';
+          qs('#verifyMsg').className = 'text-xs text-red-600';
+        } else {
+          qs('#verifyMsg').textContent = '인증에 실패했습니다.';
+          qs('#verifyMsg').className = 'text-xs text-red-600';
+        }
+
+      } catch (xhr) {
+        // 네트워크/서버 에러
+        console.log("status:", xhr.status, "body:", xhr.responseText);
+        setVerified(false);
+        qs('#verifyMsg').textContent = '인증 요청 실패';
+        qs('#verifyMsg').className = 'text-xs text-red-600';
+      }
+    }
+
+    document.getElementById('resetPw-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email')?.value?.trim() ?? null;       // loginEmail -> email로 수정
+      const password = document.getElementById('newPassword').value.trim();
+
+      if (!emailVerified) { showToast('이메일 인증을 완료하세요'); return; }
+      if (password == '') { showToast('이메일을 정확히 입력하세요'); return; }
+
+      try {
+        await $.ajax({
+          type: "POST",
+          url: "/pw/reset",
+          data: {
+            email: email,
+            password: password
+          },
+          success: function (res) {
+            showToast("비밀번호 재설정했습니다");
+          },
+          error: function (xhr) {
+            console.log("status:", xhr.status);
+            console.log("body:", xhr.responseText);
+            showToast("비밀번호 재설정 실패하였습니다");
+          }
+        });
+      } catch (xhr) {
+        console.log("status:", xhr.status, "body:", xhr.responseText);
+        showToast("비밀번호 재설정 실패하였습니다");
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      qs('#btnSend')?.addEventListener('click', sendCode);
+      qs('#btnVerify')?.addEventListener('click', verifyCode);
+
+    });
+  </script>
+</body>
+
+</html>
