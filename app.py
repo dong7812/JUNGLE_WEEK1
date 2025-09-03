@@ -274,6 +274,7 @@ def find_id():
 def posting():
     return render_template("/popup/posting.html")
 
+# 글 생성
 @app.route("/api/posts", methods=["POST"])
 def create_post():
     payload = request.get_json(force=True, silent=True) or {}
@@ -281,11 +282,12 @@ def create_post():
     category = (payload.get("category") or "").strip()
     title    = (payload.get("title") or "").strip()
     time_    = (payload.get("time") or "").strip()
-    people   = (payload.get("people") or "").strip()
+    people   = int(payload.get("people") or 0)
     tag      = (payload.get("tag") or "").strip()
     url      = (payload.get("url") or "").strip()
-    meta_image = extract_meta_image(url) if url else ""
+    meta_image = ""  # extract_meta_image(url) 가능
     createdAt = datetime.utcnow()
+
     doc = {
         "userID": userID,
         "title": title,
@@ -294,16 +296,101 @@ def create_post():
         "url": url,
         "time": time_,
         "people": people,
+        "currentParticipants": 1,          # 글쓴이 포함
+        "participants": [userID],          # 글쓴이 자동 참여
         "meta_image": meta_image,
         "createdAt": createdAt,
     }
     result = posts_col.insert_one(doc)
-    out = dict(doc)
-    out["_id"] = str(result.inserted_id)
-    out["createdAt"] = createdAt.isoformat()
-    return jsonify(success=True, post=out), 201
+    doc["_id"] = str(result.inserted_id)
+    doc["createdAt"] = createdAt.isoformat()
+    return jsonify(success=True, post=doc), 201
 
-# 목록
+
+# 상세 글
+@app.route("/api/posts/<_id>", methods=["GET"])
+def get_post(_id):
+    try:
+        oid = ObjectId(_id)
+    except Exception:
+        return jsonify(success=False, msg="invalid id"), 400
+
+    doc = posts_col.find_one({"_id": oid})
+    if not doc:
+        return jsonify(success=False), 404
+
+    doc["_id"] = str(doc["_id"])
+    if isinstance(doc.get("createdAt"), datetime):
+        doc["createdAt"] = doc["createdAt"].isoformat()
+    return jsonify(success=True, post=doc), 200
+
+
+# 참여하기
+@app.route("/api/posts/<_id>/join", methods=["POST"])
+def join_post(_id):
+    user_id = request.json.get("userID")
+    if not user_id:
+        return jsonify(success=False, msg="missing userID"), 400
+
+    try:
+        oid = ObjectId(_id)
+    except Exception:
+        return jsonify(success=False, msg="invalid id"), 400
+
+    doc = posts_col.find_one({"_id": oid})
+    if not doc:
+        return jsonify(success=False, msg="not found"), 404
+
+    if user_id in doc.get("participants", []):
+        return jsonify(success=False, msg="already joined"), 400
+
+    if doc.get("currentParticipants", 0) >= doc.get("people", 0):
+        return jsonify(success=False, msg="full"), 400
+
+    updated = posts_col.find_one_and_update(
+        {"_id": oid},
+        {
+            "$inc": {"currentParticipants": 1},
+            "$addToSet": {"participants": user_id}
+        },
+        return_document=True
+    )
+    updated["_id"] = str(updated["_id"])
+    return jsonify(success=True, post=updated), 200
+
+
+# 참여 취소
+@app.route("/api/posts/<_id>/leave", methods=["POST"])
+def leave_post(_id):
+    user_id = request.json.get("userID")
+    if not user_id:
+        return jsonify(success=False, msg="missing userID"), 400
+
+    try:
+        oid = ObjectId(_id)
+    except Exception:
+        return jsonify(success=False, msg="invalid id"), 400
+
+    doc = posts_col.find_one({"_id": oid})
+    if not doc:
+        return jsonify(success=False, msg="not found"), 404
+
+    if user_id not in doc.get("participants", []):
+        return jsonify(success=False, msg="not joined"), 400
+
+    updated = posts_col.find_one_and_update(
+        {"_id": oid},
+        {
+            "$inc": {"currentParticipants": -1},
+            "$pull": {"participants": user_id}
+        },
+        return_document=True
+    )
+    updated["_id"] = str(updated["_id"])
+    return jsonify(success=True, post=updated), 200
+
+
+# 글 목록
 @app.route("/api/posts", methods=["GET"])
 def list_posts():
     docs = []
@@ -397,20 +484,6 @@ def detail_page(_id):
     if isinstance(item.get("createdAt"), datetime):
         item["createdAt"] = item["createdAt"].isoformat()
     return render_template("/product/detail.html", item=item)
-
-@app.route("/api/posts/<_id>", methods=["GET"])
-def get_post(_id):
-    doc = None
-    try:
-        doc = posts_col.find_one({"_id": ObjectId(_id)})
-    except Exception:
-        doc = posts_col.find_one({"_id": _id})
-    if not doc:
-        return jsonify(success=False), 404
-    doc["_id"] = str(doc["_id"])
-    if isinstance(doc.get("createdAt"), datetime):
-        doc["createdAt"] = doc["createdAt"].isoformat()
-    return jsonify(success=True, post=doc), 200
 
 @app.route("/login")
 def login():

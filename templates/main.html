@@ -24,11 +24,11 @@
     </div>
 
     <div class="flex space-x-2 ml-auto">
-      <button class="p-4 bg-white rounded shadow hover:bg-gray-100">🔔</button>
       <div id="user-actions">
         <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('login') }}">로그인</a>
         <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('join') }}">회원가입</a>
-        <a href="#" id="mypage-btn" class="hidden inline-block px-3 py-1 border rounded hover:bg-gray-100">마이페이지</a>
+        <a href="{{ url_for('to_my_page') }}" id="mypage-btn"
+          class="hidden inline-block px-3 py-1 border rounded hover:bg-gray-100">마이페이지</a>
         <button id="logout-btn" class="hidden inline-block px-3 py-1 border rounded hover:bg-gray-100">로그아웃</button>
       </div>
     </div>
@@ -99,6 +99,7 @@
           {% if p.people %}{% if p.time %} · {% endif %}인원: {{ p.people }}명{% endif %}
         </div>
 
+
         {% if p.tag %}
         <div class="mt-1 text-xs text-gray-600">#{{ p.tag|e }}</div>
         {% endif %}
@@ -130,6 +131,11 @@
       </div>
       <iframe id="modal-frame" src="" class="w-full grow" style="height:72vh; border:0;"></iframe>
     </div>
+
+    <!-- 토스트/알림 -->
+    <div id="toast"
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-lg">
+    </div>
   </div>
 
   <script>
@@ -138,11 +144,19 @@
     const $modal = $("#modal");
     const $frame = $("#modal-frame");
 
+    const qs = (s, el = document) => el.querySelector(s);
+
+    const showToast = (msg) => {
+      const t = qs('#toast');
+      t.textContent = msg; t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2000);
+    };
+
     function checkAuth(callback) {
       if (token) {
         callback(token);
       } else {
-        alert('로그인이 필요한 기능입니다.');
+        showToast('로그인이 필요한 기능입니다.');
         window.location.href = '/login-page';
       }
     }
@@ -154,7 +168,7 @@
 
     $('#logout-btn').on('click', function () {
       localStorage.removeItem('token');
-      alert('로그아웃 되었습니다.');
+      showToast('로그아웃 되었습니다.');
       window.location.href = '/';
     });
 

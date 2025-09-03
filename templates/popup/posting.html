@@ -29,15 +29,6 @@
     </div>
 
     <form id="post-form" class="space-y-6">
-      <div>
-        <label for="uid" class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
-        <!-- user:ID test test test test test test test test test test  -->
-        <input type="text" id="uid" name="uid" value="{{ email }}" readonly
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          required readonly>
-
-      </div>
-
       <!-- 폼 -->
       <form id="post-form" class="space-y-6">
         <div>
@@ -85,7 +76,10 @@
         </div>
       </form>
   </div>
-
+    <!-- 토스트/알림 -->
+    <div id="toast"
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-lg">
+    </div>
 <script>
   // ====== 공통 엘리먼트 ======
   const postForm       = document.getElementById('post-form');
@@ -94,7 +88,6 @@
   const categoryRadios = document.querySelectorAll('input[name="category"]');
   const urlInput       = document.getElementById('url');
   const tagsToggleGroup= document.getElementById('tags-toggle-group');
-  const uidInputEl     = document.getElementById('uid'); // 아이디 입력창
 
   // ====== 모드 판별 (생성/수정) ======
   const params = new URLSearchParams(location.search);
@@ -105,6 +98,14 @@
     '공동구매': ['욕실용품', '식료품', '뷰티', '가전', '그외'],
     '공동배달': ['한식', '중식', '양식', '야식', '그외']
   };
+
+      const qs = (s, el = document) => el.querySelector(s);
+
+    const showToast = (msg) => {
+      const t = qs('#toast');
+      t.textContent = msg; t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2000);
+    };
 
   // ====== 유틸 ======
   function setupSelect(select, defaultText, max, unit) {
@@ -199,67 +200,62 @@
       if (uidInputEl && p.uid) uidInputEl.value = p.uid;
     } catch (e) {
       console.error(e);
-      alert('기존 게시글을 불러오지 못했습니다.');
+      showToast('기존 게시글을 불러오지 못했습니다.');
     }
   }
 
   // ====== 제출: 생성/수정 분기 ======
   postForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const selectedTagBtn = tagsToggleGroup.querySelector('.bg-emerald-500');
-    if (!selectedTagBtn) { alert('태그를 선택해주세요.'); return; }
-    if (!postForm.checkValidity()) { postForm.reportValidity(); return; }
+  const selectedTagBtn = tagsToggleGroup.querySelector('.bg-emerald-500');
+  if (!selectedTagBtn) { showToast('태그를 선택해주세요.'); return; }
+  if (!postForm.checkValidity()) { postForm.reportValidity(); return; }
 
-    const form = new FormData(postForm);
-    const payload = Object.fromEntries(form.entries());
-    payload.tag = selectedTagBtn.dataset.value;
+  const form = new FormData(postForm);
+  const payload = Object.fromEntries(form.entries());
+  payload.tag = selectedTagBtn.dataset.value;
 
-    // 카테고리 라디오 값 추가(일부 브라우저에서 FormData로 빠질 수 있음)
-    const checked = [...categoryRadios].find(r => r.checked);
-    payload.category = checked ? checked.value : '공동구매';
+  // 카테고리 라디오 값 추가
+  const checked = [...categoryRadios].find(r => r.checked);
+  payload.category = checked ? checked.value : '공동구매';
 
+  // 👉 로그인 사용자 ID 추가
+  const myId = sessionStorage.getItem("uid");
+  if (!myId) {
+    showToast('로그인이 필요합니다.');
+    return;
+  }
+  payload.userID = myId;
+
+  try {
+    const url    = postId ? `/api/posts/${encodeURIComponent(postId)}` : '/api/posts';
+    const method = postId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || '저장 실패');
+
+    const msgType = postId ? 'POST_UPDATED' : 'POST_CREATED';
+    const postObj = json.post || { _id: postId, ...payload };
     try {
-      const url    = postId ? `/api/posts/${encodeURIComponent(postId)}` : '/api/posts';
-      const method = postId ? 'PUT' : 'POST';
+      window.parent.postMessage({ type: msgType, post: postObj }, '*');
+    } catch(_) {}
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || '저장 실패');
-
-      // 부모(index.html/mypage)에게 알림
-      const msgType = postId ? 'POST_UPDATED' : 'POST_CREATED';
-      const postObj = json.post || { _id: postId, ...payload };
-      try {
-        window.parent.postMessage({ type: msgType, post: postObj }, '*');
-      } catch(_) {}
-
-      // 돌아가기 (iframe이든 단독페이지든 둘 다 커버)
-      if (document.referrer) {
-        history.back();
-      } else {
-        window.location.assign('/mypage'); // 마이페이지 경로에 맞게 조정
-      }
-    } catch (err) {
-      console.error(err);
-      alert(err.message || '저장 중 오류가 발생했습니다.');
+    if (document.referrer) {
+      history.back();
+    } else {
+      window.location.assign('/mypage');
     }
-  });
-
-  // ====== 아이디 입력창에 임시 email 채우기 ======
-  window.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const res = await fetch("/api/users");
-      const { success, users } = await res.json();
-      if (success && Array.isArray(users) && users.length && uidInputEl) {
-        uidInputEl.value = users[2]?.email || users[0]?.email || '';
-      }
-    } catch (e) { console.error(e); }
-  });
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || '저장 중 오류가 발생했습니다.');
+  }
+});
 
   // ====== 페이지 최초 로드 플로우 ======
   (async () => {
