@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>제품 상세</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    #chat-messages::-webkit-scrollbar { width: 6px; }
+    #chat-messages::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    #chat-messages::-webkit-scrollbar-track { background-color: #f1f5f9; }
+    #chat-modal-content { transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <div class="container mx-auto max-w-4xl bg-white min-h-screen shadow-lg">
+    <!-- 헤더 -->
+    <header class="flex justify-between items-center p-4 border-b border-gray-200 bg-white sticky top-0 z-50">
+      <a href="/" class="flex items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#05D182"/></svg>
+        <span class="font-bold text-2xl text-[#05D182]">Jungle</span>
+      </a>
+      <div class="flex items-center space-x-4">
+        <a href="#" class="relative text-gray-600 hover:text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </a>
+        <button class="text-gray-600 hover:text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <a href="#" class="text-sm text-gray-600 hover:text-gray-800">로그아웃</a>
+      </div>
+    </header>
+
+    <!-- 메인 -->
+    <main class="p-6 md:p-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 제품 이미지 -->
+        <div>
+          <!-- ✨ CHANGED: API로 채울 이미지 요소 -->
+          <img id="item-image" src="" alt="상품 이미지"
+               class="w-full rounded-lg border border-gray-200">
+        </div>
+
+        <!-- 제품 설명/버튼 -->
+        <div class="flex flex-col justify-center space-y-4">
+          <!-- ✨ CHANGED: API로 채울 제목 -->
+          <h1 id="item-title" class="text-2xl font-bold text-gray-800"></h1>
+
+          <div class="flex items-center text-gray-700 space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.273-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.273.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <!-- ✨ CHANGED: 참여인원 텍스트 자리 -->
+            <span id="participants-info" class=""></span>
+          </div>
+
+          <div class="flex items-center text-gray-700 space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="timer">00 : 30 : 29</span>
+          </div>
+
+          <div class="text-sm text-gray-600 space-y-1">
+            <!-- ✨ CHANGED: 카테고리/태그/시간도 API로 채움 -->
+            <div>카테고리: <span id="item-category">-</span></div>
+            <div>태그: <span id="item-tag">-</span></div>
+            <div>소요시간: <span id="item-time">-</span> / 인원: <span id="item-people">-</span></div>
+          </div>
+
+          <div class="flex items-center space-x-2 pt-2">
+            <a id="item-url" href="#" target="_blank" class="text-blue-600 underline hidden">상품 링크 열기</a>
+          </div>
+
+          <div class="flex items-center space-x-2 pt-4">
+            <button id="action-btn" class="w-full bg-[#05D182] hover:bg-[#04A868] text-white font-bold py-3 rounded-lg transition-colors">공구 참여하기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 다른 상품 보기 -->
+      <div class="mt-12">
+        <h2 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">다른 상품 보기</h2>
+        <!-- ✨ CHANGED: 여기로 append -->
+        <div id="other-items" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 채팅 모달 -->
+  <div id="chat-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+    <div id="chat-modal-content" class="w-full max-w-lg h-[90vh] bg-white flex flex-col shadow-2xl rounded-2xl transform scale-95 opacity-0 overflow-hidden">
+      <header class="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.273-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.273.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <!-- ✨ CHANGED: 채팅방 제목도 아이템명으로 -->
+          <h1 id="chat-title" class="text-lg font-bold text-gray-800">공구 채팅방</h1>
+        </div>
+        <button id="close-chat-btn" class="text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors">나가기</button>
+      </header>
+      <main id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-slate-50"></main>
+      <footer class="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex-shrink-0">
+        <form id="chat-form" class="flex items-center space-x-3">
+          <input type="text" id="message-input" placeholder="메시지를 입력하세요." autocomplete="off"
+                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#05D182] transition">
+          <button type="submit"
+                  class="bg-[#05D182] hover:bg-[#04A868] text-white p-2 rounded-full shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#05D182] focus:ring-opacity-50 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </button>
+        </form>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const fallbackImg = 'https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png';
+
+      // 요소 캐시
+      const $title = document.getElementById('item-title');
+      const $img = document.getElementById('item-image');
+      const $participants = document.getElementById('participants-info');
+      const $cat = document.getElementById('item-category');
+      const $tag = document.getElementById('item-tag');
+      const $time = document.getElementById('item-time');
+      const $people = document.getElementById('item-people');
+      const $link = document.getElementById('item-url');
+      const $chatTitle = document.getElementById('chat-title');
+      const $others = document.getElementById('other-items');
+
+      const actionBtn = document.getElementById('action-btn');
+      const timerElement = document.getElementById('timer');
+
+      // 채팅 모달
+      const chatModalOverlay = document.getElementById('chat-modal-overlay');
+      const chatModalContent = document.getElementById('chat-modal-content');
+      const closeChatBtn = document.getElementById('close-chat-btn');
+
+      // 상태
+      let currentParticipants = 1;
+      const maxParticipants = 3;
+      let hasJoined = false;
+
+      // 타이머
+      if (timerElement) {
+        let duration = 30 * 60 + 29;
+        const timerInterval = setInterval(() => {
+          if (duration < 0) {
+            clearInterval(timerInterval);
+            timerElement.textContent = "시간 만료";
+            return;
+          }
+          const h = Math.floor(duration / 3600);
+          const m = Math.floor((duration % 3600) / 60);
+          const s = duration % 60;
+          timerElement.textContent = `${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+          duration--;
+        }, 1000);
+      }
+
+      // UI 업데이트
+      const updateUI = () => {
+        $participants.textContent = `참여 인원 ${currentParticipants} / ${maxParticipants}`;
+        if (hasJoined) {
+          actionBtn.textContent = '공구 취소하기';
+          actionBtn.classList.remove('bg-[#05D182]','hover:bg-[#04A868]');
+          actionBtn.classList.add('bg-gray-600','hover:bg-gray-700');
+        } else {
+          actionBtn.textContent = '공구 참여하기';
+          actionBtn.classList.remove('bg-gray-600','hover:bg-gray-700');
+          actionBtn.classList.add('bg-[#05D182]','hover:bg-[#04A868]');
+        }
+      };
+
+      // ✨ 핵심: URL에서 _id 추출 → 상세 API 호출 → DOM append
+      (async function initDetail() {
+        const _id = location.pathname.split('/').pop(); // /detail/xxxx → xxxx
+
+        try {
+          const res = await fetch(`/api/posts/${_id}`);
+          if (!res.ok) throw new Error('not found');
+          const { success, post } = await res.json();
+          if (!success) throw new Error('not found');
+
+          // 상세 정보 채우기
+          $title.textContent = post.title || '제목 없음';
+          $chatTitle.textContent = `${post.title || '공구'} 채팅방`;
+          $img.src = post.meta_image || fallbackImg;
+          $img.onerror = () => { $img.src = fallbackImg; };
+          $cat.textContent = post.category || '-';
+          $tag.textContent = post.tag ? `#${post.tag}` : '-';
+          $time.textContent = post.time || '-';
+          $people.textContent = post.people || '-';
+          if (post.url) { $link.href = post.url; $link.classList.remove('hidden'); }
+
+          updateUI();
+
+          // “다른 상품 보기” 채우기
+          const listRes = await fetch('/api/posts');
+          const listJson = await listRes.json();
+          if (listJson.success && Array.isArray(listJson.posts)) {
+            const others = listJson.posts.filter(p => p._id !== _id).slice(0, 6);
+            $others.innerHTML = others.map(p => {
+              const img = p.meta_image || fallbackImg;
+              return `
+                <a href="/detail/${p._id}" class="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <img src="${img}" alt="${p.title || ''}" class="w-full h-40 object-cover" referrerpolicy="no-referrer">
+                  <div class="px-3 py-2 text-sm truncate">${p.title || '제목 없음'}</div>
+                </a>
+              `;
+            }).join('');
+          }
+        } catch (e) {
+          console.error(e);
+          // 실패 시 홈으로 보내거나 404 처리 가능
+          // location.replace('/');
+        }
+      })();
+    });
+  </script>
+</body>
+</html>
