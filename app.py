@@ -41,7 +41,7 @@ UA = {
 # client = MongoClient('mongodb://dlehdrb020:dl71727812!@54.180.80.148', 27017)
 client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
 db = client.dbjungle
-posts_col = client.db.posts
+posts_col = db.posts
 
 @app.route('/')
 def home():

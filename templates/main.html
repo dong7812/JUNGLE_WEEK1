@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,8 +19,7 @@
   <header class="flex justify-between items-center p-3 bg-white sticky top-0 z-50">
     <div>
       <a href="/">
-        <img src="{{ url_for('static', filename='logo.svg') }}" alt="로고"
-             class="w-[180px] h-[60px] object-cover" />
+        <img src="{{ url_for('static', filename='logo.svg') }}" alt="로고" class="w-[180px] h-[60px] object-cover" />
       </a>
     </div>
 
@@ -36,38 +36,76 @@
 
   <!-- 카드 그리드 -->
   <main class="container mx-auto mt-6 px-4">
+
+    <!-- 필터 패널 -->
+    <div id="filter-panel" class="hidden mx-4 mt-2 p-4 border rounded-lg bg-white shadow">
+      <div class="flex flex-col sm:flex-row gap-6">
+        <!-- 태그 -->
+        <div>
+          <div class="font-semibold mb-2">태그</div>
+          <div class="flex flex-wrap gap-3 text-sm">
+            <label><input type="checkbox" name="tag" value="욕실용품" class="mr-1">#욕실용품</label>
+            <label><input type="checkbox" name="tag" value="식료품" class="mr-1">#식료품</label>
+            <label><input type="checkbox" name="tag" value="뷰티" class="mr-1">#뷰티</label>
+            <label><input type="checkbox" name="tag" value="가전" class="mr-1">#가전</label>
+            <label><input type="checkbox" name="tag" value="그외" class="mr-1">#그외</label>
+          </div>
+        </div>
+
+        <!-- 카테고리 -->
+        <div>
+          <div class="font-semibold mb-2">카테고리</div>
+          <div class="flex flex-wrap gap-3 text-sm">
+            <label><input type="checkbox" name="category" value="공동구매" class="mr-1">공동구매</label>
+            <label><input type="checkbox" name="category" value="공동배달" class="mr-1">공동배달</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex gap-2">
+        <button id="filter-apply" class="px-3 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600">적용</button>
+        <button id="filter-clear" class="px-3 py-2 border rounded hover:bg-gray-100">초기화</button>
+      </div>
+    </div>
+
+    <div class="flex space-x-2 justify-end px-4 mt-2">
+      <button id="filter-toggle" class="p-4 bg-white rounded shadow hover:bg-gray-100">☰</button>
+    </div>
+
     <div class="grid grid-cols-2 gap-4" id="post-grid">
       {% if posts and posts|length > 0 %}
-        {% for p in posts %}
-          <a href="{{ url_for('detail_page', _id=p._id) }}"
-             class="block bg-white rounded shadow hover:shadow-md transition p-4 text-left">
-            {% if p.meta_image %}
-              <img src="{{ p.meta_image }}" alt="" referrerpolicy="no-referrer"
-                   class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
-            {% else %}
-              <img src="https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png" alt="이미지 없음"
-                   class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
-            {% endif %}
+      {% for p in posts %}
+      <a href="{{ url_for('detail_page', _id=p._id) }}"
+        class="post-card block bg-white rounded shadow hover:shadow-md transition p-4 text-left"
+        data-tag="{{ (p.tag or '')|e }}" data-category="{{ (p.category or '')|e }}">
 
-            <div class="flex items-center justify-between">
-              <h2 class="font-bold text-lg truncate mr-2">{{ (p.title or "제목 없음")|e }}</h2>
-              {% if p.category %}
-                <span class="text-xs bg-gray-100 px-2 py-0.5 rounded">{{ p.category|e }}</span>
-              {% endif %}
-            </div>
+        {% if p.meta_image %}
+        <img src="{{ p.meta_image }}" alt="" referrerpolicy="no-referrer"
+          class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
+        {% else %}
+        <img src="https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png" alt="이미지 없음"
+          class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
+        {% endif %}
 
-            <div class="mt-2 text-sm text-gray-500">
-              {% if p.time %}시간: {{ p.time }}시간{% endif %}
-              {% if p.people %}{% if p.time %} · {% endif %}인원: {{ p.people }}명{% endif %}
-            </div>
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-lg truncate mr-2">{{ (p.title or "제목 없음")|e }}</h2>
+          {% if p.category %}
+          <span class="text-xs bg-gray-100 px-2 py-0.5 rounded">{{ p.category|e }}</span>
+          {% endif %}
+        </div>
 
-            {% if p.tag %}
-              <div class="mt-1 text-xs text-gray-600">#{{ p.tag|e }}</div>
-            {% endif %}
-          </a>
-        {% endfor %}
+        <div class="mt-2 text-sm text-gray-500">
+          {% if p.time %}시간: {{ p.time }}시간{% endif %}
+          {% if p.people %}{% if p.time %} · {% endif %}인원: {{ p.people }}명{% endif %}
+        </div>
+
+        {% if p.tag %}
+        <div class="mt-1 text-xs text-gray-600">#{{ p.tag|e }}</div>
+        {% endif %}
+      </a>
+      {% endfor %}
       {% else %}
-        <div class="col-span-2 text-center text-gray-500 py-12">아직 게시물이 없습니다.</div>
+      <div class="col-span-2 text-center text-gray-500 py-12">아직 게시물이 없습니다.</div>
       {% endif %}
     </div>
   </main>
@@ -114,7 +152,7 @@
       $('#mypage-btn, #logout-btn').removeClass('hidden');
     }
 
-    $('#logout-btn').on('click', function() {
+    $('#logout-btn').on('click', function () {
       localStorage.removeItem('token');
       alert('로그아웃 되었습니다.');
       window.location.href = '/';
@@ -133,7 +171,7 @@
       $frame.attr("src", "");
     }
 
-    $("#close-modal, #modal").on("click", function(e) {
+    $("#close-modal, #modal").on("click", function (e) {
       if (this === e.target || $(e.target).is("#close-modal")) {
         closeModal();
       }
@@ -205,6 +243,45 @@
     function prependPost(p) {
       $grid.prepend(renderCard(p));
     }
+
+    // 패널 토글
+    $("#filter-toggle").on("click", () => {
+      $("#filter-panel").toggleClass("hidden");
+    });
+
+    function getCheckedValues(name) {
+      return $(`input[name="${name}"]:checked`).map((_, el) => $(el).val().toLowerCase()).get();
+    }
+
+    // 필터 적용
+    $("#filter-apply").on("click", () => {
+      const tags = getCheckedValues("tag");           // ex) ['욕실용품', '가전']
+      const cats = getCheckedValues("category");      // ex) ['공동구매']
+
+      // 선택이 하나도 없으면 전체 표시
+      const useTag = tags.length > 0;
+      const useCat = cats.length > 0;
+
+      $(".post-card").each(function () {
+        const t = ($(this).data("tag") || "").toString().toLowerCase();
+        const c = ($(this).data("category") || "").toString().toLowerCase();
+
+        // 태그/카테고리 각각 '선택 없음'이면 그 조건은 무시(통과)
+        const tagOk = useTag ? tags.includes(t) : true;
+        const catOk = useCat ? cats.includes(c) : true;
+
+        $(this).toggle(tagOk && catOk);
+      });
+    });
+
+    // 필터 초기화
+    $("#filter-clear").on("click", () => {
+      $('#filter-panel input[type="checkbox"]').prop("checked", false);
+      $(".post-card").show();
+    });
+
+
   </script>
 </body>
+
 </html>
