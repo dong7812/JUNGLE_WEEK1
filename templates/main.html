@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,24 +18,21 @@
   <header class="flex justify-between items-center p-3 bg-white sticky top-0 z-50">
     <div>
       <a href="/">
-        <!-- 실제 배포 시 /static 경로 권장 -->
-        <img src="{{ url_for('static', filename='logo.svg') }}" alt="로고" class="w-[180px] h-[60px] object-cover" />
+        <img src="{{ url_for('static', filename='logo.svg') }}" alt="로고"
+             class="w-[180px] h-[60px] object-cover" />
       </a>
     </div>
 
     <div class="flex space-x-2 ml-auto">
       <button class="p-4 bg-white rounded shadow hover:bg-gray-100">🔔</button>
-      <!-- 로그인 했을때 마이페이지로 변경 -->
-      <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('login') }}">로그인</a>
-      <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('join') }}">회원가입</a>
+      <div id="user-actions">
+        <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('login') }}">로그인</a>
+        <a class="px-3 py-1 border rounded hover:bg-gray-100" href="{{ url_for('join') }}">회원가입</a>
+        <a href="#" id="mypage-btn" class="hidden inline-block px-3 py-1 border rounded hover:bg-gray-100">마이페이지</a>
+        <button id="logout-btn" class="hidden inline-block px-3 py-1 border rounded hover:bg-gray-100">로그아웃</button>
+      </div>
     </div>
   </header>
-
-  <!-- (예시) 정렬/보기 전환 -->
-  <div class="flex space-x-2 justify-end px-4 mt-2">
-    <button class="p-4 bg-white rounded shadow hover:bg-gray-100">↕️</button>
-    <button class="p-4 bg-white rounded shadow hover:bg-gray-100">☰</button>
-  </div>
 
   <!-- 카드 그리드 -->
   <main class="container mx-auto mt-6 px-4">
@@ -46,12 +42,10 @@
           <a href="{{ url_for('detail_page', _id=p._id) }}"
              class="block bg-white rounded shadow hover:shadow-md transition p-4 text-left">
             {% if p.meta_image %}
-              <img src="{{ p.meta_image }}" alt=""
-                   referrerpolicy="no-referrer"
+              <img src="{{ p.meta_image }}" alt="" referrerpolicy="no-referrer"
                    class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
             {% else %}
-              <img src="https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png"
-                   alt="이미지 없음"
+              <img src="https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png" alt="이미지 없음"
                    class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">
             {% endif %}
 
@@ -84,27 +78,87 @@
       class="bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600 transition">
       글쓰기 ✏️
     </button>
-    <button class="bg-green-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-600 transition">
-      메일 📧
+    <button id="open-chat-btn"
+      class="bg-[#05D182] text-white px-4 py-2 rounded-full shadow-lg hover:bg-[#04A868] transition">
+      채팅 📧
     </button>
   </div>
 
-  <!-- 모달 오버레이 (화면 전체 회색 + 중앙 카드) -->
-  <div id="posting-modal" class="hidden fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-4">
+  <!-- 공용 모달 -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-4">
     <div class="w-[680px] max-w-[95vw] bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
       <div class="flex justify-end p-2 border-b">
-        <button id="close-posting" class="px-3 py-1 rounded hover:bg-gray-100">닫기 ✖</button>
+        <button id="close-modal" class="px-3 py-1 rounded hover:bg-gray-100">닫기 ✖</button>
       </div>
-      <iframe id="posting-frame" src="" class="w-full grow" style="height:72vh; border:0;"></iframe>
+      <iframe id="modal-frame" src="" class="w-full grow" style="height:72vh; border:0;"></iframe>
     </div>
   </div>
 
   <script>
     const $grid = $("#post-grid");
-    const $modal = $("#posting-modal");
-    const $frame = $("#posting-frame");
+    const token = localStorage.getItem('token');
+    const $modal = $("#modal");
+    const $frame = $("#modal-frame");
 
-    // 글 작성 성공 시에만 클라이언트에서 1개 prepend
+    function checkAuth(callback) {
+      if (token) {
+        callback(token);
+      } else {
+        alert('로그인이 필요한 기능입니다.');
+        window.location.href = '/login-page';
+      }
+    }
+
+    if (token) {
+      $('#user-actions a:contains("로그인"), #user-actions a:contains("회원가입")').hide();
+      $('#mypage-btn, #logout-btn').removeClass('hidden');
+    }
+
+    $('#logout-btn').on('click', function() {
+      localStorage.removeItem('token');
+      alert('로그아웃 되었습니다.');
+      window.location.href = '/';
+    });
+
+    // 모달 열기/닫기
+    function openModal(url) {
+      $frame.attr("src", url);
+      $modal.removeClass("hidden");
+      $("body").addClass("overflow-hidden");
+    }
+
+    function closeModal() {
+      $modal.addClass("hidden");
+      $("body").removeClass("overflow-hidden");
+      $frame.attr("src", "");
+    }
+
+    $("#close-modal, #modal").on("click", function(e) {
+      if (this === e.target || $(e.target).is("#close-modal")) {
+        closeModal();
+      }
+    });
+
+    // 글쓰기 버튼 → 모달 열기
+    $("#open-posting").on("click", () => {
+      openModal("/posting");
+    });
+
+    // 채팅 버튼 → 모달 열기
+    $("#open-chat-btn").on("click", () => {
+      checkAuth((token) => {
+        openModal(`/chat`);
+      });
+    });
+
+    // posting.html → 부모로 postMessage 수신 (저장 성공 시)
+    window.addEventListener("message", (e) => {
+      const data = e.data || {};
+      if (data.type === "POST_CREATED" && data.post) {
+        prependPost(data.post);
+        closeModal();
+      }
+    });
 
     function escapeHtml(str) {
       return String(str)
@@ -119,17 +173,17 @@
       const imgURL = p.meta_image || "";
       const imgHTML = imgURL
         ? `<img src="${imgURL}" alt="" referrerpolicy="no-referrer"
-                class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">`
+              class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">`
         : `<img src="https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png"
-                alt="이미지 없음"
-                class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">`;
+              alt="이미지 없음"
+              class="w-[400px] h-[400px] object-cover rounded mb-2 mx-auto">`;
 
       const title = p.title ? escapeHtml(p.title) : "제목 없음";
       const categoryBadge = p.category
         ? `<span class="text-xs bg-gray-100 px-2 py-0.5 rounded">${escapeHtml(p.category)}</span>`
         : "";
 
-      const time  = (p.time ?? "") !== "" ? `시간: ${p.time}시간` : "";
+      const time = (p.time ?? "") !== "" ? `시간: ${p.time}시간` : "";
       const people = (p.people ?? "") !== "" ? `인원: ${p.people}명` : "";
       const sep = (time && people) ? " · " : "";
       const tagHTML = p.tag ? `#${escapeHtml(p.tag)}` : "";
@@ -151,30 +205,6 @@
     function prependPost(p) {
       $grid.prepend(renderCard(p));
     }
-
-    // 모달 열기/닫기
-    $("#open-posting").on("click", () => {
-      $frame.attr("src", "/posting");
-      $modal.removeClass("hidden");
-      document.body.classList.add("overflow-hidden");
-    });
-    $("#close-posting").on("click", () => {
-      $modal.addClass("hidden");
-      document.body.classList.remove("overflow-hidden");
-      $frame.attr("src", "");
-    });
-    $("#posting-modal").on("click", (e) => {
-      if (e.target === e.currentTarget) $("#close-posting").trigger("click");
-    });
-
-    // posting.html → 부모로 postMessage 수신 (저장 성공 시)
-    window.addEventListener("message", (e) => {
-      const data = e.data || {};
-      if (data.type === "POST_CREATED" && data.post) {
-        prependPost(data.post);
-        $("#close-posting").trigger("click");
-      }
-    });
   </script>
 </body>
 </html>
