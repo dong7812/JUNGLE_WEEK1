@@ -76,7 +76,7 @@
             
             $.ajax({
                 type: "POST",
-                url: "/login", // 실제 로그인 API 엔드포인트
+                url: "/do/login", // 실제 로그인 API 엔드포인트
                 contentType: "application/json",
                 data: JSON.stringify({ email: $('#email').val(), password: $('#password').val() }),
                 success: function (response) {
