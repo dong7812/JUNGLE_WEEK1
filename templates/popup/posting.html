@@ -28,52 +28,60 @@
       </div>
     </div>
 
-    <!-- 폼 -->
+    <!-- 임시 ID -->
     <form id="post-form" class="space-y-6">
       <div>
-        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">제목</label>
-        <input type="text" id="title" name="title" placeholder="포스트 제목을 입력하세요"
+        <label for="userID" class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
+        <input type="text" id="userID" name="userID" placeholder="ID 입력"
           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           required>
       </div>
+      <!-- 폼 -->
+      <form id="post-form" class="space-y-6">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">제목</label>
+          <input type="text" id="title" name="title" placeholder="포스트 제목을 입력하세요"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            required>
+        </div>
 
-      <div>
-        <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL</label>
-        <input type="url" id="url" name="url" placeholder="https://example.com"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          required>
-      </div>
+        <div>
+          <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+          <input type="url" id="url" name="url" placeholder="https://example.com"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            required>
+        </div>
 
-      <div>
-        <label for="time" class="block text-sm font-medium text-gray-700 mb-1">시간</label>
-        <select id="time" name="time"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-          required>
-          <!-- JS로 1~24 채움 -->
-        </select>
-      </div>
+        <div>
+          <label for="time" class="block text-sm font-medium text-gray-700 mb-1">시간</label>
+          <select id="time" name="time"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+            required>
+            <!-- JS로 1~24 채움 -->
+          </select>
+        </div>
 
-      <div>
-        <label for="people" class="block text-sm font-medium text-gray-700 mb-1">인원수</label>
-        <select id="people" name="people"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-          required>
-          <!-- JS로 1~10 채움 -->
-        </select>
-      </div>
+        <div>
+          <label for="people" class="block text-sm font-medium text-gray-700 mb-1">인원수</label>
+          <select id="people" name="people"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+            required>
+            <!-- JS로 1~10 채움 -->
+          </select>
+        </div>
 
-      <div>
-        <span class="block text-sm font-medium text-gray-700 mb-2">태그</span>
-        <div id="tags-toggle-group" class="flex flex-wrap gap-2"></div>
-      </div>
+        <div>
+          <span class="block text-sm font-medium text-gray-700 mb-2">태그</span>
+          <div id="tags-toggle-group" class="flex flex-wrap gap-2"></div>
+        </div>
 
-      <div class="flex justify-end gap-3 pt-2">
-        <!-- 닫기는 부모가 관리하므로 여기서는 submit만 -->
-        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">
-          포스팅
-        </button>
-      </div>
-    </form>
+        <div class="flex justify-end gap-3 pt-2">
+          <!-- 닫기는 부모가 관리하므로 여기서는 submit만 -->
+          <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">
+            포스팅
+          </button>
+        </div>
+      </form>
   </div>
 
   <script>
