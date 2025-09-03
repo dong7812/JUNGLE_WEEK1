@@ -1,0 +1,22 @@
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 스크롤바 디자인 */
+#chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background-color: #f1f5f9;
+}
+
+/* 커스텀 트랜지션을 위한 스타일 */
+#chat-modal-content {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
