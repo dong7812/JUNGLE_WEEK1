@@ -401,7 +401,7 @@ def detail_page(_id):
     item["_id"] = str(item["_id"])
     if isinstance(item.get("createdAt"), datetime):
         item["createdAt"] = item["createdAt"].isoformat()
-    return render_template("detail.html", item=item)
+    return render_template("/product/detail.html", item=item)
 
 @app.route("/api/posts/<_id>", methods=["GET"])
 def get_post(_id):
