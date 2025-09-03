@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts (Optional, for a cleaner look) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
+
+    <title>제품 상세 페이지</title>
+</head>
+
+<body class="bg-gray-100">
+
+    <header class="flex justify-between items-center p-3 bg-white sticky top-0 z-50">
+        <div>
+            <a href="/">
+                <img src="../static/logo.svg">
+            </a>
+        </div>
+
+        <!-- 우측 아이콘 및 로그아웃 -->
+        <div class="flex items-center space-x-4">
+            <a href="#" class="relative text-gray-600 hover:text-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </a>
+            <button class="text-gray-600 hover:text-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <a href="#" class="text-sm text-gray-600 hover:text-gray-800">로그아웃</a>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="p-6 md:p-8">
+        <!-- 제품 상세 정보 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 제품 이미지 -->
+            <div>
+                <img src="https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/0bbc/8489b12e5969bac77338bb240a3aa87f8fb1e1f65fd40b1816625845ed31.jpg"
+                    alt="Persil 세제" class="w-full rounded-lg border border-gray-200">
+            </div>
+
+            <!-- 제품 설명 및 버튼 -->
+            <div class="flex flex-col justify-center space-y-4">
+                <h1 class="text-2xl font-bold text-gray-800">Persil 세제 공구중 ~</h1>
+                <p class="text-gray-600">세제 필요하신 분 있나요??</p>
+
+                <div class="flex items-center text-gray-700 space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.273-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.273.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="participants-info">참여 인원 1 / 3</span>
+                </div>
+
+                <div class="flex items-center text-gray-700 space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span id="timer">00 : 30 : 29</span>
+                </div>
+
+                <div class="flex items-center space-x-2 pt-4">
+                    <button id="action-btn"
+                        class="w-full bg-[#05D182] hover:bg-[#04A868] text-white font-bold py-3 rounded-lg transition-colors">공구
+                        참여하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 다른 상품 보기 -->
+        <div class="mt-12">
+            <h2 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">다른 상품 보기</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- 다른 상품 아이템 -->
+                <a href="#"
+                    class="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                    <img src="https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/0bbc/8489b12e5969bac77338bb240a3aa87f8fb1e1f65fd40b1816625845ed31.jpg"
+                        alt="다른 상품 1" class="w-full h-40 object-cover">
+                </a>
+                <a href="#"
+                    class="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                    <img src="https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/0bbc/8489b12e5969bac77338bb240a3aa87f8fb1e1f65fd40b1816625845ed31.jpg"
+                        alt="다른 상품 2" class="w-full h-40 object-cover">
+                </a>
+                <a href="#"
+                    class="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                    <img src="https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/0bbc/8489b12e5969bac77338bb240a3aa87f8fb1e1f65fd40b1816625845ed31.jpg"
+                        alt="다른 상품 3" class="w-full h-40 object-cover">
+                </a>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <!-- 채팅 팝업 모달 (통합됨) -->
+    <div id="chat-modal-overlay"
+        class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <!-- 채팅 UI 컨테이너 -->
+        <div id="chat-modal-content"
+            class="w-full max-w-lg h-[90vh] bg-white flex flex-col shadow-2xl rounded-2xl transform scale-95 opacity-0 overflow-hidden">
+            <!-- 채팅 헤더 -->
+            <header
+                class="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10 flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.273-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.273.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h1 id="chat-title" class="text-lg font-bold text-gray-800">Persil 세제 공구 채팅방</h1>
+                </div>
+                <button id="close-chat-btn"
+                    class="text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors">
+                    나가기
+                </button>
+            </header>
+            <!-- 채팅 메시지 영역 -->
+            <main id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-slate-50"></main>
+            <!-- 메시지 입력창 -->
+            <footer class="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex-shrink-0">
+                <form id="chat-form" class="flex items-center space-x-3">
+                    <input type="text" id="message-input" placeholder="메시지를 입력하세요." autocomplete="off"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#05D182] transition">
+                    <button type="submit"
+                        class="bg-[#05D182] hover:bg-[#04A868] text-white p-2 rounded-full shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#05D182] focus:ring-opacity-50 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                    </button>
+                </form>
+            </footer>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 페이지 공통 요소 ---
+            const timerElement = document.getElementById('timer');
+            const actionBtn = document.getElementById('action-btn');
+            const participantsInfo = document.getElementById('participants-info');
+
+            // --- 채팅 관련 요소 ---
+            const chatModalOverlay = document.getElementById('chat-modal-overlay');
+            const chatModalContent = document.getElementById('chat-modal-content');
+            const closeChatBtn = document.getElementById('close-chat-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatForm = document.getElementById('chat-form');
+            const messageInput = document.getElementById('message-input');
+
+            // --- 상태 변수 ---
+            let currentParticipants = 1;
+            const maxParticipants = 3;
+            let hasJoined = false;
+            let websocket;
+            const myUsername = `사용자${Math.floor(Math.random() * 1000)}`;
+
+            // --- 타이머 기능 ---
+            if (timerElement) {
+                let duration = 30 * 60 + 29;
+                const timerInterval = setInterval(() => {
+                    if (duration < 0) {
+                        clearInterval(timerInterval);
+                        timerElement.textContent = "시간 만료";
+                        return;
+                    }
+                    const hours = Math.floor(duration / 3600);
+                    const minutes = Math.floor((duration % 3600) / 60);
+                    const seconds = duration % 60;
+
+                    timerElement.textContent = `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+                    duration--;
+                }, 1000);
+            }
+
+            // --- UI 업데이트 함수 ---
+            const updateUI = () => {
+                participantsInfo.textContent = `참여 인원 ${currentParticipants} / ${maxParticipants}`;
+                if (hasJoined) {
+                    actionBtn.textContent = '공구 취소하기';
+                    actionBtn.classList.remove('bg-[#05D182]', 'hover:bg-[#04A868]');
+                    actionBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                } else {
+                    actionBtn.textContent = '공구 참여하기';
+                    actionBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    actionBtn.classList.add('bg-[#05D182]', 'hover:bg-[#04A868]');
+                }
+            };
+
+            // --- 채팅 팝업 열기/닫기 ---
+            const openChatModal = () => {
+                chatModalOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    chatModalOverlay.classList.add('opacity-100');
+                    chatModalContent.classList.remove('scale-95', 'opacity-0');
+                    chatModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            const closeChatModal = () => {
+                chatModalContent.classList.remove('scale-100', 'opacity-100');
+                chatModalContent.classList.add('scale-95', 'opacity-0');
+                chatModalOverlay.classList.remove('opacity-100');
+                setTimeout(() => {
+                    chatModalOverlay.classList.add('hidden');
+                }, 300);
+            };
+
+            closeChatBtn.addEventListener('click', closeChatModal);
+
+            // --- 공구 참여/취소 버튼 이벤트 ---
+            actionBtn.addEventListener('click', () => {
+                if (hasJoined) { // 취소 로직
+                    currentParticipants--;
+                    hasJoined = false;
+                } else { // 참여 로직
+                    currentParticipants++;
+                    hasJoined = true;
+                }
+                updateUI();
+
+                if (currentParticipants === maxParticipants) {
+                    alert('공구 인원이 모두 모였습니다! 채팅방이 열립니다.');
+                    openChatModal();
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>
