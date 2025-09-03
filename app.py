@@ -48,6 +48,22 @@ def home():
     posts = list(posts_col.find().sort("_id", -1).limit(20))
     return render_template('main.html', posts = posts)
 
+@app.route("/check/id", methods=["POST"])
+def check_id():
+    uid = request.form.get("uid")
+    if not uid:
+        return jsonify({"ok": False, "msg": "no uid"}), 400
+
+    # DB에서 해당 uid 존재 여부 확인
+    existing = db.user.find_one({"uid": uid})
+    
+    if existing:
+        # 이미 존재하는 아이디
+        return jsonify({"ok": False, "msg": "duplicated"})
+    else:
+        # 사용 가능한 아이디
+        return jsonify({"ok": True, "msg": "available"})
+
 # --- JWT 관련 함수 (헤더 방식) ---
 
 
