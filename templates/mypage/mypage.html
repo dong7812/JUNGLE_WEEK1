@@ -2,153 +2,221 @@
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Google Fonts (Optional, for a cleaner look) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" type="text/css" href="/static/main.css">
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-
-    <title>마이페이지</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jungle - 마이페이지</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+  </style>
 </head>
 
 <body class="bg-gray-100">
 
-    <div class="container mx-auto max-w-4xl bg-white min-h-screen shadow-lg">
-        <!-- 헤더 -->
-        <header class="flex justify-between items-center p-4 border-b border-gray-200 bg-white sticky top-0 z-50">
-            <!-- 로고 -->
-            <a href="#" class="flex items-center gap-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="12" fill="#05D182" />
-                </svg>
-                <span class="font-bold text-2xl text-[#05D182]">Jungle</span>
-            </a>
+  <div class="container mx-auto max-w-4xl bg-white min-h-screen shadow-lg">
+    <!-- 헤더 -->
+    <header class="flex justify-between items-center p-4 border-b border-gray-200 bg-white sticky top-0 z-50">
+      <a href="/" class="flex items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="#05D182" />
+        </svg>
+        <span class="font-bold text-2xl text-[#05D182]">Jungle</span>
+      </a>
+      <div class="flex items-center space-x-4">
+        <button class="text-gray-600 hover:text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          </svg>
+        </button>
+        <button class="text-gray-600 hover:text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </header>
 
-            <!-- 우측 아이콘 및 로그아웃 -->
-            <div class="flex items-center space-x-4">
-                <button class="text-gray-600 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                    </svg>
-                </button>
-                <button class="text-gray-600 hover:text-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- 메인 컨텐츠 -->
-        <main class="p-6 md:p-8">
-            <!-- 사용자 프로필 섹션 -->
-            <section class="flex flex-col items-center text-center border-b border-gray-200 pb-8 mb-8">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-800">11-54</h1>
-                <p class="text-gray-500">asd2xc@gmail.com</p>
-            </section>
-
-            <!-- 참여/모집 중인 게시글 목록 -->
-            <section id="post-list" class="space-y-4">
-
-                <!-- 게시글 카드 1 -->
-                <div class="post-card border border-gray-200 rounded-lg p-4 flex items-center gap-4">
-                    <img src="https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/0bbc/8489b12e5969bac77338bb240a3aa87f8fb1e1f65fd40b1816625845ed31.jpg"
-                        alt="Persil 세제" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
-                    <div class="flex-grow text-left">
-                        <div class="flex items-center justify-start gap-2 flex-wrap mb-1">
-                            <span
-                                class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">공동구매</span>
-                            <span class="text-xs text-gray-600">12/23명</span>
-                            <span
-                                class="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">진행중</span>
-                            <span class="text-xs text-gray-500">9월 12일 16시</span>
-                        </div>
-                        <h2 class="font-bold text-lg text-gray-800">Persil 세제 공구중~</h2>
-                        <p class="text-sm text-gray-500">#욕실용품</p>
-                    </div>
-                    <div class="flex-shrink-0 text-right w-28">
-                        <p class="font-bold text-lg text-red-600">19,820원</p>
-                        <p class="text-xs text-gray-500">(1개입당 381원)</p>
-                    </div>
-                    <div class="flex-shrink-0 flex items-center space-x-2">
-                        <button
-                            class="delete-btn text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors">삭제</button>
-                        <span class="text-sm bg-[#05D182] text-white font-bold py-2 px-4 rounded-lg">모집중</span>
-                    </div>
-                </div>
-
-                <!-- 게시글 카드 2 -->
-                <div class="post-card border border-gray-200 rounded-lg p-4 flex items-center gap-4">
-                    <img src="https://img.danawa.com/prod_img/500000/924/528/img/4528924_1.jpg?_v=20230523103429"
-                        alt="치킨" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
-                    <div class="flex-grow text-left">
-                        <div class="flex items-center justify-start gap-2 flex-wrap mb-1">
-                            <span
-                                class="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">배달</span>
-                            <span class="text-xs text-gray-600">2/3명</span>
-                            <span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">임박</span>
-                            <span class="text-xs text-gray-500">9월 2일 16시</span>
-                        </div>
-                        <h2 class="font-bold text-lg text-gray-800">치킨 같이 배달 시켜요~</h2>
-                        <p class="text-sm text-gray-500">#음식</p>
-                    </div>
-                    <div class="flex-shrink-0 text-right w-28">
-                        <p class="font-bold text-lg text-red-600">19,820원</p>
-                        <p class="text-xs text-gray-500">(1개입당 381원)</p>
-                    </div>
-                    <div class="flex-shrink-0 flex items-center space-x-2">
-                        <button
-                            class="delete-btn text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors">삭제</button>
-                        <span class="text-sm bg-red-500 text-white font-bold py-2 px-4 rounded-lg">마감임박</span>
-                    </div>
-                </div>
-
-            </section>
-        </main>
+    <!-- ADDED: 테스트용 uid 입력창 -->
+    <div class="p-4 border-b border-gray-200 flex items-center gap-2">
+      <div class="relative flex-grow">
+        <input id="uid-input" type="text" placeholder="테스트용 uid 입력"
+          class="w-full border rounded px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[#05D182]" />
+        <button id="uid-clear" type="button"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">✕</button>
+      </div>
+      <button id="uid-submit"
+        class="bg-[#05D182] hover:bg-[#04A868] text-white font-bold py-2 px-4 rounded transition-colors">
+        확인
+      </button>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const postList = document.getElementById('post-list');
+    <!-- 메인 -->
+    <main class="p-6 md:p-8">
+      <!-- 사용자 프로필 -->
+      <section class="flex flex-col items-center text-center border-b border-gray-200 pb-8 mb-8">
+        <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <h1 id="profile-name" class="text-2xl font-bold text-gray-800">이름</h1>
+        <p id="profile-email" class="text-gray-500">이메일</p>
+      </section>
 
-            postList.addEventListener('click', (event) => {
-                if (event.target.classList.contains('delete-btn')) {
-                    const card = event.target.closest('.post-card');
+      <!-- 나의 게시글 목록 -->
+      <section id="post-list" class="space-y-4">
 
-                    if (card) {
-                        const isConfirmed = true; 
-                        if (isConfirmed) {
-                            // 확인 시, 카드를 부드럽게 사라지게 하는 효과
-                            card.style.transition = 'opacity 0.5s ease';
-                            card.style.opacity = '0';
-                            
-                            setTimeout(() => {
-                                card.remove();
-                            }, 500);
-                        }
-                    }
-                }
-            });
+
+      </section>
+    </main>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const postList = document.getElementById('post-list');
+      const profileName = document.getElementById('profile-name');
+      const profileEmail = document.getElementById('profile-email');
+      const uidInput = document.getElementById('uid-input');
+      const uidSubmit = document.getElementById('uid-submit');
+      const uidClear = document.getElementById('uid-clear');
+
+      const fallbackImg = 'https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png';
+      let currentEmail = ''; // = uid (posts.uid와 동일)
+
+      // 1) 프로필: /api/users -> users[0]로 이름/이메일 채우기
+      async function loadProfileFromUsers0() {
+        try {
+          const res = await fetch('/api/users');
+          const json = await res.json();
+          if (!json.success || !Array.isArray(json.users) || !json.users.length) {
+            throw new Error('no users');
+          }
+          const u0 = json.users[0];
+          const name = u0.name || (u0.email ? u0.email.split('@')[0] : '이름');
+          const email = u0.email || '';
+
+          profileName.textContent = name;
+          profileEmail.textContent = email || '이메일';
+          currentEmail = email || ''; // email이 없으면 빈 문자열
+        } catch (e) {
+          console.error(e);
+          profileName.textContent = '이름';
+          profileEmail.textContent = '이메일';
+          currentEmail = '';
+        }
+      }
+
+      // 2) 내 글 목록(= posts.uid === currentEmail)
+      async function loadMyPosts() {
+        const uid = currentEmail;
+        if (!uid) {
+          postList.innerHTML = `<p class="text-gray-500 text-sm">로그인 정보가 없어 게시글을 불러올 수 없어요.</p>`;
+          return;
+        }
+        try {
+          const res = await fetch(`/api/users/${encodeURIComponent(uid)}/posts`);
+          const json = await res.json();
+          if (!json.success) throw new Error('Load failed');
+          const posts = Array.isArray(json.posts) ? json.posts : [];
+          if (!posts.length) {
+            postList.innerHTML = `<p class="text-gray-500 text-sm">게시글이 없습니다.</p>`;
+            return;
+          }
+          postList.innerHTML = posts.map(renderCard).join('');
+        } catch (e) {
+          console.error(e);
+          postList.innerHTML = `<p class="text-gray-500 text-sm">내 게시글을 불러오지 못했어요.</p>`;
+        }
+      }
+
+      // 3) 카드 렌더
+      function renderCard(p) {
+        const img = p.meta_image || fallbackImg;
+        const peopleTxt = p.people ? `${p.people}명` : '-';
+        const tagTxt = p.tag ? `#${p.tag}` : '';
+        return `
+      <div class="post-card border border-gray-200 rounded-lg p-4 flex items-center gap-4" data-id="${p._id}">
+        <img src="${img}" alt="상품 이미지" class="w-24 h-24 object-cover rounded-md flex-shrink-0" referrerpolicy="no-referrer">
+        <div class="flex-grow text-left">
+          <div class="flex items-center justify-start gap-2 flex-wrap mb-1">
+            <span class="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">${p.category || '-'}</span>
+            <span class="text-xs text-gray-500">${peopleTxt}</span>
+          </div>
+          <h2 class="font-bold text-lg text-gray-800">${p.title || '제목 없음'}</h2>
+          <p class="text-sm text-gray-500">${tagTxt}</p>
+        </div>
+        <div class="flex-shrink-0 flex items-center space-x-2">
+          <button class="delete-btn text-sm bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">삭제</button>
+        </div>
+      </div>`;
+      }
+
+      // 4) 수정/삭제(이벤트 위임)
+      postList.addEventListener('click', async (e) => {
+        const card = e.target.closest('.post-card');
+        if (!card) return;
+        const id = card.dataset.id;
+
+        if (e.target.classList.contains('edit-btn')) {
+          if (!id) return;
+          window.location.assign(`/posting?id=${encodeURIComponent(id)}`);
+          return;
+        }
+
+        if (e.target.classList.contains('delete-btn')) {
+          if (!id) return;
+          try {
+            const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+            const json = await res.json();
+            if (!json.success) throw new Error('delete failed');
+            card.style.transition = 'opacity .25s ease';
+            card.style.opacity = '0';
+            setTimeout(() => card.remove(), 250);
+          } catch (err) {
+            console.error(err);
+            alert('삭제에 실패했습니다.');
+          }
+        }
+      });
+
+      // 5) 테스트용 입력 반영: 확인 → 프로필/리스트 모두 입력값으로 전환
+      if (uidSubmit) {
+        uidSubmit.addEventListener('click', () => {
+          const newEmail = (uidInput.value || '').trim();
+          if (!newEmail) { alert('uid(=email)를 입력하세요.'); return; }
+          currentEmail = newEmail;
+          profileEmail.textContent = newEmail;
+          profileName.textContent = newEmail.split('@')[0];
+          loadMyPosts();
         });
-    </script>
+      }
+
+      // ❌ 지우기: 입력칸 비우고, 프로필/리스트를 다시 API 기본값으로 복구
+      if (uidClear) {
+        uidClear.addEventListener('click', async () => {
+          uidInput.value = '';
+          uidInput.focus();
+          await loadProfileFromUsers0();
+          await loadMyPosts();
+        });
+      }
+
+      // 최초 로드: API 값으로 프로필/목록 세팅
+      (async () => {
+        await loadProfileFromUsers0();
+        await loadMyPosts();
+      })();
+    });
+  </script>
 
 </body>
 
