@@ -44,20 +44,6 @@
       </div>
     </header>
 
-    <!-- ADDED: 테스트용 uid 입력창 -->
-    <div class="p-4 border-b border-gray-200 flex items-center gap-2">
-      <div class="relative flex-grow">
-        <input id="uid-input" type="text" placeholder="테스트용 uid 입력"
-          class="w-full border rounded px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[#05D182]" />
-        <button id="uid-clear" type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">✕</button>
-      </div>
-      <button id="uid-submit"
-        class="bg-[#05D182] hover:bg-[#04A868] text-white font-bold py-2 px-4 rounded transition-colors">
-        확인
-      </button>
-    </div>
-
     <!-- 메인 -->
     <main class="p-6 md:p-8">
       <!-- 사용자 프로필 -->
@@ -113,8 +99,6 @@
         }
       }
 
-
-      // 2) 내 글 목록(= posts.uid === currentEmail)
       async function loadMyPosts() {
         const uid = currentEmail;
         if (!uid) {
