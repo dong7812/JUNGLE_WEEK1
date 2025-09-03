@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
-    <script>
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -73,6 +73,10 @@
         <a href="{{ url_for('to_reset_pw') }}" class="text-gray-600 hover:text-emerald-600 hover:underline">비밀번호 재설정</a>
       </div>
 
+      <!-- 토스트/알림 -->
+      <div id="toast"
+        class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-lg">
+      </div>
     </main>
     </div>
 
@@ -112,14 +116,11 @@
               showToast("ID 찾기에 성공했습니다");
             },
             error: function (xhr) {
-              console.log("status:", xhr.status);
-              console.log("body:", xhr.responseText);
               showToast("ID 찾기에 실패했습니다");
             }
           });
         } catch (e) {
-          console.log(e);
-          showToast("ID 찾기에 실패했습니다", e);
+          showToast("ID 찾기에 실패했습니다");
         }
 
       }
