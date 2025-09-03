@@ -285,7 +285,7 @@ def create_post():
     people   = int(payload.get("people") or 0)
     tag      = (payload.get("tag") or "").strip()
     url      = (payload.get("url") or "").strip()
-    meta_image = ""  # extract_meta_image(url) 가능
+    meta_image = ""
     createdAt = datetime.utcnow()
 
     doc = {
@@ -389,7 +389,6 @@ def leave_post(_id):
     updated["_id"] = str(updated["_id"])
     return jsonify(success=True, post=updated), 200
 
-
 # 글 목록
 @app.route("/api/posts", methods=["GET"])
 def list_posts():
@@ -466,6 +465,23 @@ def _first(*vals):
         if v and str(v).strip():
             return str(v).strip()
     return "" 
+
+@app.route("/check/id", methods=["POST"])
+def check_id():
+    uid = request.form.get("uid")
+    if not uid:
+        return jsonify({"ok": False, "msg": "no uid"}), 400
+
+    # DB에서 해당 uid 존재 여부 확인
+    existing = db.user.find_one({"uid": uid})
+    
+    if existing:
+        # 이미 존재하는 아이디
+        return jsonify({"ok": False, "msg": "duplicated"})
+    else:
+        # 사용 가능한 아이디
+        return jsonify({"ok": True, "msg": "available"})
+
 
 @app.route("/detail/<_id>", methods=["GET"])
 def detail_page(_id):
