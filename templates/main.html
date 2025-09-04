@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shop Page</title>
+  <title>공구조쿠</title>
 
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -157,7 +157,7 @@
         callback(token);
       } else {
         showToast('로그인이 필요한 기능입니다.');
-        window.location.href = '/login-page';
+        window.location.href = '/login';
       }
     }
 
@@ -193,7 +193,9 @@
 
     // 글쓰기 버튼 → 모달 열기
     $("#open-posting").on("click", () => {
-      openModal("/posting");
+      checkAuth((token) => {
+        openModal("/posting");
+      });
     });
 
     // 채팅 버튼 → 모달 열기
