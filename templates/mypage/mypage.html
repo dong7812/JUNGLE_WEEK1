@@ -27,21 +27,6 @@
         </svg>
         <span class="font-bold text-2xl text-[#05D182]">Jungle</span>
       </a>
-      <div class="flex items-center space-x-4">
-        <button class="text-gray-600 hover:text-gray-800">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-          </svg>
-        </button>
-        <button class="text-gray-600 hover:text-gray-800">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
     </header>
 
     <!-- 메인 -->
@@ -76,7 +61,8 @@
       const uidClear = document.getElementById('uid-clear');
 
       const fallbackImg = 'https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png';
-      let currentEmail = ''; // = uid (posts.uid와 동일)
+      let currentUid = '';      // ← posts.userID와 매칭할 값 (uid)
+
 
       // 1) 프로필: /api/users -> users[0]로 이름/이메일 채우기
       async function loadProfileFromUsers0() {
@@ -84,23 +70,27 @@
           const res = await fetch('/api/user');
           const json = await res.json();
           if (!json.success || !json.user) throw new Error('no user');
+
           const u = json.user;
           const name = u.name || (u.email ? u.email.split('@')[0] : '이름');
           const email = u.email || '';
 
+          // 화면 표시
           profileName.textContent = name;
           profileEmail.textContent = email || '이메일';
-          currentEmail = email || '';
+
+          // 목록 조회용 uid 저장 (이 값으로 /api/posts?uid=... 호출)
+          currentUid = u.uid || '';
         } catch (e) {
           console.error(e);
           profileName.textContent = '이름';
           profileEmail.textContent = '이메일';
-          currentEmail = '';
+          currentUid = '';
         }
       }
 
       async function loadMyPosts() {
-        const uid = currentEmail;
+        const uid = currentUid;   // ← 여기!
         if (!uid) {
           postList.innerHTML = `<p class="text-gray-500 text-sm">로그인 정보가 없어 게시글을 불러올 수 없어요.</p>`;
           return;
@@ -110,16 +100,15 @@
           const json = await res.json();
           if (!json.success) throw new Error('Load failed');
           const posts = Array.isArray(json.posts) ? json.posts : [];
-          if (!posts.length) {
-            postList.innerHTML = `<p class="text-gray-500 text-sm">게시글이 없습니다.</p>`;
-            return;
-          }
-          postList.innerHTML = posts.map(renderCard).join('');
+          postList.innerHTML = posts.length
+            ? posts.map(renderCard).join('')
+            : `<p class="text-gray-500 text-sm">게시글이 없습니다.</p>`;
         } catch (e) {
           console.error(e);
           postList.innerHTML = `<p class="text-gray-500 text-sm">내 게시글을 불러오지 못했어요.</p>`;
         }
       }
+
 
       function renderCard(p) {
         const img = p.meta_image || fallbackImg;
@@ -137,7 +126,6 @@
         <p class="text-sm text-gray-500">${tagTxt}</p>
       </div>
       <div class="flex-shrink-0 flex items-center space-x-2">
-        <button class="edit-btn text-sm border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-4 rounded-lg">수정</button>
         <button class="delete-btn text-sm bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">삭제</button>
       </div>
     </div>`;
@@ -171,29 +159,6 @@
           }
         }
       });
-
-
-      // 5) 테스트용 입력 반영: 확인 → 프로필/리스트 모두 입력값으로 전환
-      if (uidSubmit) {
-        uidSubmit.addEventListener('click', () => {
-          const newEmail = (uidInput.value || '').trim();
-          if (!newEmail) { alert('uid(=email)를 입력하세요.'); return; }
-          currentEmail = newEmail;
-          profileEmail.textContent = newEmail;
-          profileName.textContent = newEmail.split('@')[0];
-          loadMyPosts();
-        });
-      }
-
-      // ❌ 지우기: 입력칸 비우고, 프로필/리스트를 다시 API 기본값으로 복구
-      if (uidClear) {
-        uidClear.addEventListener('click', async () => {
-          uidInput.value = '';
-          uidInput.focus();
-          await loadProfileFromUsers0();
-          await loadMyPosts();
-        });
-      }
 
       // 최초 로드: API 값으로 프로필/목록 세팅
       (async () => {
