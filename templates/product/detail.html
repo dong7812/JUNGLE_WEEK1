@@ -121,6 +121,7 @@
   </div>
 
   <script>
+    const token = localStorage.getItem('token');
     document.addEventListener('DOMContentLoaded', () => {
       const fallbackImg = 'https://www.gachinet.co.kr/assets/images/common/thumb_no_img.png';
 
@@ -163,6 +164,14 @@
         }
       };
 
+     function checkAuth(callback) {
+      if (token) {
+        callback(token);
+      } else {
+        showToast('로그인이 필요한 기능입니다.');
+        window.location.href = '/login';
+      }
+    }
 
       // 참여/취소 버튼 이벤트
       actionBtn.addEventListener('click', async () => {
