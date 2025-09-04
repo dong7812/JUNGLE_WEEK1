@@ -169,13 +169,10 @@
             showToast("인증번호를 전송했습니다");
           },
           error: function (xhr) {
-            console.log("status:", xhr.status);
-            console.log("body:", xhr.responseText);
             showToast("인증번호 전송에 실패했습니다");
           }
         });
       } catch (e) {
-        console.log(e);
         showToast("인증번호 전송이 실패했습니다", e);
       }
 
@@ -219,7 +216,6 @@
 
       } catch (xhr) {
         // 네트워크/서버 에러
-        console.log("status:", xhr.status, "body:", xhr.responseText);
         setVerified(false);
         qs('#verifyMsg').textContent = '인증 요청 실패';
         qs('#verifyMsg').className = 'text-xs text-red-600';
@@ -246,13 +242,10 @@
             showToast("비밀번호 재설정했습니다");
           },
           error: function (xhr) {
-            console.log("status:", xhr.status);
-            console.log("body:", xhr.responseText);
             showToast("비밀번호 재설정 실패하였습니다");
           }
         });
       } catch (xhr) {
-        console.log("status:", xhr.status, "body:", xhr.responseText);
         showToast("비밀번호 재설정 실패하였습니다");
       }
     });
